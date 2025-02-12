@@ -17,8 +17,10 @@ Build a learning portal that allows users to learn a new language. The portal sh
 
 ### Database Schema
 
-We will have the following tables:
+The database will be a single sqlite database called `words.db`
+This will be in the root of the backend folder.
 
+We will have the following tables:
 - `words`:
   Store words in the language the user is learning
 
@@ -71,11 +73,9 @@ We will have the following tables:
 
 ### API Endpoints
 
-#### GET /api/dashboard/last_study_session
+#### GET `/api/dashboard/last_study_session`
 
 Returns information about the most recent study session.
-
-##### JSON Response
 
 ```json
 {
@@ -88,12 +88,11 @@ Returns information about the most recent study session.
 }
 ```
 
-#### GET /api/dashboard/study_progress
+#### GET `/api/dashboard/study_progress`
 
 Returns study progress statistics.
 Please note that the frontend will determine progress bar basedon total words studied and total available words.
 
-##### JSON Response
 
 ```json
 {
@@ -102,11 +101,9 @@ Please note that the frontend will determine progress bar basedon total words st
 }
 ```
 
-#### GET /api/dashboard/quick-stats
+#### GET `/api/dashboard/quick-stats`
 
 Returns quick overview statistics.
-
-##### JSON Response
 
 ```json
 {
@@ -117,9 +114,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/study_activities/:id
-
-##### JSON Response
+#### GET `/api/study_activities/:id`
 
 ```json
 {
@@ -130,8 +125,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/study_activities/:id/study_sessions
-
+#### GET `/api/study_activities/:id/study_sessions`
 - pagination with 100 items per page
 
 ```json
@@ -155,25 +149,23 @@ Returns quick overview statistics.
 }
 ```
 
-#### POST /api/study_activities
+#### POST `/api/study_activities`
 
 ##### Request Params
 
 - group_id integer
 - study_activity_id integer
 
-##### JSON Response
-
+```json
 {
 "id": 124,
 "group_id": 123
 }
+```
 
-#### GET /api/words
+#### GET `/api/words`
 
 - pagination with 100 items per page
-
-##### JSON Response
 
 ```json
 {
@@ -195,9 +187,8 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/words/:id
+#### GET `/api/words/:id`
 
-##### JSON Response
 
 ```json
 {
@@ -217,11 +208,10 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/groups
+#### GET `/api/groups`
 
 - pagination with 100 items per page
 
-##### JSON Response
 
 ```json
 {
@@ -241,9 +231,8 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/groups/:id
+#### GET `/api/groups/:id`
 
-##### JSON Response
 
 ```json
 {
@@ -255,9 +244,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/groups/:id/words
-
-##### JSON Response
+#### GET `/api/groups/:id/words`
 
 ```json
 {
@@ -279,9 +266,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/groups/:id/study_sessions
-
-##### JSON Response
+#### GET `/api/groups/:id/study_sessions`
 
 ```json
 {
@@ -304,11 +289,10 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/study_sessions
+#### GET `/api/study_sessions`
 
 - pagination with 100 items per page
 
-##### JSON Response
 
 ```json
 {
@@ -331,9 +315,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/study_sessions/:id
-
-##### JSON Response
+#### GET `/api/study_sessions/:id`
 
 ```json
 {
@@ -346,11 +328,9 @@ Returns quick overview statistics.
 }
 ```
 
-#### GET /api/study_sessions/:id/words
+#### GET `/api/study_sessions/:id/words`
 
 - pagination with 100 items per page
-
-##### JSON Response
 
 ```json
 {
@@ -372,9 +352,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### POST /api/reset_history
-
-##### JSON Response
+#### POST `/api/reset_history`
 
 ```json
 {
@@ -383,9 +361,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### POST /api/full_reset
-
-##### JSON Response
+#### POST `/api/full_reset`
 
 ```json
 {
@@ -394,7 +370,7 @@ Returns quick overview statistics.
 }
 ```
 
-#### POST /api/study_sessions/:id/words/:word_id/review
+#### POST `/api/study_sessions/:id/words/:word_id/review`
 
 ##### Request Params
 
@@ -410,8 +386,6 @@ Returns quick overview statistics.
 }
 ```
 
-##### JSON Response
-
 ```json
 {
 	"success": true,
@@ -420,4 +394,39 @@ Returns quick overview statistics.
 	"correct": true,
 	"created_at": "2025-02-08T17:33:07-05:00"
 }
+```
+
+## Tasks
+
+Lets list out the possible tasks needed for this project:
+
+### Initialize Database
+This task will initialize the database called `words.db` with the schema mentioned above.
+
+### Migrate Database
+This task will run a series of migrations sql files on the database.
+Migrations will be in the `migrations` folder.
+The migration files will be run in order of their filenames.
+The filenames should look like this:
+```sql
+0001_init.sql
+0002_create_words_table.sql
+```
+
+### Seed Data
+This task will import json files and transform them into target data for the database.
+All seed files are in the `seed` folder.
+All seed files should be loaded.
+In our task we should have DSL to specify each seed file and its expected group word name.
+
+
+```json
+[
+  {
+    "kanji": "いい",
+    "romaji": "ii",
+    "english": "good",
+  },
+  ...
+]
 ```
