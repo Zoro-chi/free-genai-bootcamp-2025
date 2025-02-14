@@ -60,17 +60,17 @@ curl http://localhost:8008/api/generate -d '{
 ```
 
 ## Technical Uncertainty
-Q: Does bridge mode mean we can only access the Ollama API with another model in the Docker Compose?
+Q: Does bridge mode mean we can only access the Ollama API with another model in the Docker Compose? \
 A: No, the host machine will be able to access it.
 
-Q: Which port is being mapped 8008->141414?
+Q: Which port is being mapped 8008->141414? \
 A: In this case, 8008 is the port that the host machine will access. The other port is the guest port (the port of the service inside the container).
 
-Q: If we pass the LLM_MODEL_ID to the Ollama server, will it download the model on start?
+Q: If we pass the LLM_MODEL_ID to the Ollama server, will it download the model on start? \
 A: It does not appear so. The Ollama CLI might be running multiple APIs, so you need to call the /pull API before trying to generate text.
 
-Q: Will the model be downloaded in the container? Does that mean the ML model will be deleted when the container stops running?
+Q: Will the model be downloaded in the container? Does that mean the ML model will be deleted when the container stops running? \
 A: The model will download into the container and vanish when the container stops running. You need to mount a local drive, and there is probably more work to be done.
 
-Q: For LLM service which can text-generation, it suggests it will only work with TGI/vLLM and all you have to do is have it running. Does TGI and vLLM have a standardized API or is there code to detect which one is running? Do we have to really use Xeon or Gaudi processor?
+Q: For LLM service which can text-generation, it suggests it will only work with TGI/vLLM and all you have to do is have it running. Does TGI and vLLM have a standardized API or is there code to detect which one is running? Do we have to really use Xeon or Gaudi processor? \
 A: vLLM, TGI (Text Generation Inference), and Ollama all offer APIs with OpenAI compatibility, so in theory, they should be interchangeable.
