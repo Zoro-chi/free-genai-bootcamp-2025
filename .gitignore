@@ -1,1 +1,17 @@
-opea-comps/.env
+# Ignore all venv directories
+venv/
+
+# Other common ignores
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+ENV/
+env.bak/
+venv.bak/
+.idea/
+.vscode/
+.DS_Store
+.env

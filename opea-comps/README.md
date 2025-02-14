@@ -45,7 +45,7 @@ Once the Ollama server is running, you can make API calls to the Ollama API. Ref
 ### Download (Pull) a Model
 
 ```sh
-curl http://localhost:8008/api/pull -d '{
+curl http://localhost:9000/api/pull -d '{
   "model": "llama3.2:1b"
 }'
 ```
@@ -53,7 +53,7 @@ curl http://localhost:8008/api/pull -d '{
 ### Generate Request
 
 ```sh
-curl http://localhost:8008/api/generate -d '{
+curl http://localhost:9000/api/generate -d '{
   "model": "llama3.2:1b",
   "prompt": "Why is the sky blue?"
 }'
