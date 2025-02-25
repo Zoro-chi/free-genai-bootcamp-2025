@@ -1,15 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ChevronUp, ChevronDown } from 'lucide-react'
-import { Word } from '../services/api'
-
-export type WordSortKey = 'kanji' | 'romaji' | 'english' | 'correct_count' | 'wrong_count'
+import { Word, WordSortKey } from '../services/api'
 
 interface WordsTableProps {
-  words: Word[]
-  sortKey: WordSortKey
-  sortDirection: 'asc' | 'desc'
-  onSort: (key: WordSortKey) => void
+  words: Word[];
+  sortKey: WordSortKey;
+  sortDirection: 'asc' | 'desc';
+  onSort: (key: WordSortKey) => void;
 }
 
 export default function WordsTable({ words, sortKey, sortDirection, onSort }: WordsTableProps) {

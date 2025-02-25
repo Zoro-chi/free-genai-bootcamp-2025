@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://127.0.0.1:5000';
 
 // Group types
 export interface Group {
@@ -39,6 +39,8 @@ export interface WordsResponse {
   current_page: number;
   total_words: number;
 }
+
+export type WordSortKey = 'kanji' | 'romaji' | 'english' | 'correct_count' | 'wrong_count';
 
 // Study Session types
 export interface StudySession {
@@ -107,7 +109,6 @@ export interface GroupWordsResponse {
 export const fetchGroupDetails = async (
   groupId: number,
   page: number = 1,
-  sortBy: string = 'kanji',
   order: 'asc' | 'desc' = 'asc'
 ): Promise<GroupDetails> => {
   const response = await fetch(`${API_BASE_URL}/groups/${groupId}`);

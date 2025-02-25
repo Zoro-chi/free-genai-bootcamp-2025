@@ -49,7 +49,7 @@ export default function StudyActivityShow() {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch(`http://localhost:5000/api/study-activities/${id}`)
+        const response = await fetch(`http://127.0.0.1:5000/api/study-activities/${id}`)
         if (!response.ok) {
           throw new Error('Failed to fetch study activity')
         }
@@ -59,7 +59,7 @@ export default function StudyActivityShow() {
         
         // Fetch sessions for the current page
         const sessionsResponse = await fetch(
-          `http://localhost:5000/api/study-activities/${id}/sessions?page=${currentPage}&per_page=${ITEMS_PER_PAGE}`
+          `http://127.0.0.1:5000/api/study-activities/${id}/sessions?page=${currentPage}&per_page=${ITEMS_PER_PAGE}`
         )
         if (!sessionsResponse.ok) {
           throw new Error('Failed to fetch sessions')
@@ -144,7 +144,12 @@ export default function StudyActivityShow() {
       {sessionData && sessionData.items.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Study Sessions</h2>
-          <StudySessionsTable sessions={sessionData.items} />
+          <StudySessionsTable 
+            sessions={sessionData.items} 
+            sortKey="start_time" 
+            sortDirection="asc" 
+            onSort={(key) => console.log(`Sorting by ${key}`)} 
+          />
           {sessionData.total_pages > 1 && (
             <div className="mt-4">
               <Pagination
