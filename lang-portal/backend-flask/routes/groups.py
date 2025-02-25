@@ -58,66 +58,35 @@ def load(app):
     except Exception as e:
       return jsonify({"error": str(e)}), 500
 
-  @app.route('/groups/<int:id>', methods=['GET'])
-  @cross_origin()
-  def get_group(id):
-    try:
-      cursor = app.db.cursor()
-
-      # Get group details
-      cursor.execute('''
-        SELECT id, name, words_count
-        FROM groups
-        WHERE id = ?
-      ''', (id,))
-      
-      group = cursor.fetchone()
-      if not group:
-        return jsonify({"error": "Group not found"}), 404
-
-      return jsonify({
-        "id": group["id"],
-        "group_name": group["name"],
-        "word_count": group["words_count"]
-      })
-    except Exception as e:
-      return jsonify({"error": str(e)}), 500
-
   @app.route('/groups/<int:id>/words', methods=['GET'])
   @cross_origin()
   def get_group_words(id):
     try:
       cursor = app.db.cursor()
-      
-      # Get pagination parameters
+
+      # Get the current page number from query parameters (default is 1)
       page = int(request.args.get('page', 1))
       words_per_page = 10
       offset = (page - 1) * words_per_page
 
-      # Get sorting parameters
-      sort_by = request.args.get('sort_by', 'kanji')
-      order = request.args.get('order', 'asc')
+      # Get sorting parameters from the query string
+      sort_by = request.args.get('sort_by', 'kanji')  # Default to sorting by 'kanji'
+      order = request.args.get('order', 'asc')  # Default to ascending order
 
-      # Validate sort parameters
+      # Validate sort_by and order
       valid_columns = ['kanji', 'romaji', 'english', 'correct_count', 'wrong_count']
       if sort_by not in valid_columns:
         sort_by = 'kanji'
       if order not in ['asc', 'desc']:
         order = 'asc'
 
-      # First, check if the group exists
-      cursor.execute('SELECT name FROM groups WHERE id = ?', (id,))
-      group = cursor.fetchone()
-      if not group:
-        return jsonify({"error": "Group not found"}), 404
-
-      # Query to fetch words with pagination and sorting
+      # Query to fetch words for this group
       cursor.execute(f'''
-        SELECT w.*, 
-               COALESCE(wr.correct_count, 0) as correct_count,
-               COALESCE(wr.wrong_count, 0) as wrong_count
+        SELECT w.id, w.kanji, w.romaji, w.english,
+            COALESCE(wr.correct_count, 0) as correct_count,
+            COALESCE(wr.wrong_count, 0) as wrong_count
         FROM words w
-        JOIN word_groups wg ON w.id = wg.word_id
+        JOIN words_groups wg ON w.id = wg.word_id
         LEFT JOIN word_reviews wr ON w.id = wr.word_id
         WHERE wg.group_id = ?
         ORDER BY {sort_by} {order}
@@ -129,7 +98,7 @@ def load(app):
       # Get total words count for pagination
       cursor.execute('''
         SELECT COUNT(*) 
-        FROM word_groups 
+        FROM words_groups 
         WHERE group_id = ?
       ''', (id,))
       total_words = cursor.fetchone()[0]
@@ -147,15 +116,17 @@ def load(app):
           "wrong_count": word["wrong_count"]
         })
 
+      # Return words and pagination metadata
       return jsonify({
         'words': words_data,
         'total_pages': total_pages,
-        'current_page': page
+        'current_page': page,
+        'total_words': total_words
       })
     except Exception as e:
       return jsonify({"error": str(e)}), 500
-
-  # todo GET /groups/:id/words/raw
+    finally:
+      app.db.close()
 
   @app.route('/groups/<int:id>/study_sessions', methods=['GET'])
   @cross_origin()
@@ -247,3 +218,96 @@ def load(app):
       })
     except Exception as e:
       return jsonify({"error": str(e)}), 500
+    
+  @app.route('/groups/<int:group_id>', methods=['GET'])
+  @cross_origin()
+  def get_group(group_id):
+      try:
+          cursor = app.db.cursor()
+          cursor.execute('''
+              SELECT g.id, g.name, COUNT(wg.word_id) as total_word_count
+              FROM groups g
+              LEFT JOIN words_groups wg ON g.id = wg.group_id
+              WHERE g.id = ?
+              GROUP BY g.id
+          ''', (group_id,))
+          
+          group = cursor.fetchone()
+          
+          if not group:
+              return jsonify({"error": "Group not found"}), 404
+          
+          return jsonify({
+              "id": group["id"],
+              "name": group["name"],
+              "stats": {
+                  "total_word_count": group["total_word_count"]
+              }
+          })
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
+      finally:
+          app.db.close()
+          
+  @app.route('/groups/<int:group_id>/words/<int:word_id>', methods=['POST'])
+  @cross_origin()
+  def add_word_to_group(group_id, word_id):
+      try:
+          cursor = app.db.cursor()
+          
+          # Check if the group exists
+          cursor.execute('SELECT id FROM groups WHERE id = ?', (group_id,))
+          found_group = cursor.fetchone()
+          if not found_group:
+              return jsonify({"error": "Group not found"}), 404
+          
+          # Check if the word exists
+          cursor.execute('SELECT id FROM words WHERE id = ?', (word_id,))
+          found_word = cursor.fetchone()
+          if not found_word:
+              return jsonify({"error": "Word not found"}), 404
+          
+          # Insert or ignore the group-word relationship
+          cursor.execute('''
+              INSERT OR IGNORE INTO words_groups (group_id, word_id)
+              VALUES (?, ?)
+          ''', (group_id, word_id))
+          app.db.commit()
+          
+          # Recalculate words_count in the groups table
+          cursor.execute('''
+              UPDATE groups
+              SET words_count = (
+                  SELECT COUNT(*) FROM words_groups WHERE group_id = ?
+              )
+              WHERE id = ?
+          ''', (group_id, group_id))
+          app.db.commit()
+          
+          return jsonify({"success": True}), 200
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
+      finally:
+          app.db.close()
+          
+  @app.route('/groups', methods=['POST'])
+  @cross_origin()
+  def create_group():
+      try:
+          data = request.get_json()
+          if not data or 'name' not in data:
+              return jsonify({"error": "Invalid input"}), 400
+              
+          cursor = app.db.cursor()
+          cursor.execute(
+              'INSERT INTO groups (name) VALUES (?)',
+              (data['name'],)
+          )
+          app.db.commit()
+          group_id = cursor.lastrowid
+          
+          return jsonify({"id": group_id, "name": data['name']}), 201
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
+      finally:
+          app.db.close()

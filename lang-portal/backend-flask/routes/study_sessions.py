@@ -170,3 +170,63 @@ def load(app):
       return jsonify({"message": "Study history cleared successfully"}), 200
     except Exception as e:
       return jsonify({"error": str(e)}), 500
+    
+  # Endpoint: POST /study-sessions to create a new study session
+  @app.route('/api/study-sessions', methods=['POST'])
+  @cross_origin()
+  def create_study_session():
+      try:
+          data = request.get_json()
+          cursor = app.db.cursor()
+          cursor.execute("INSERT INTO study_sessions (group_id, study_activity_id) VALUES (?, ?)", (data['group_id'], data['study_activity_id']))
+          app.db.commit()
+          session_id = cursor.lastrowid
+          return jsonify({'id': session_id}), 201
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
+      finally:
+          app.db.close()
+          
+  # Endpoint: POST /study-sessions/:id/reviews
+  @app.route('/api/study-sessions/<int:session_id>/reviews', methods=['POST'])
+  @cross_origin()
+  def add_review(session_id):
+      try:
+          data = request.get_json()
+          if not data or not all(k in data for k in ('word_id', 'correct')):
+              return jsonify({"error": "Invalid input"}), 400
+          
+          cursor = app.db.cursor()
+          
+          # Insert review item
+          cursor.execute(
+              "INSERT INTO word_review_items (study_session_id, word_id, correct) VALUES (?, ?, ?)",
+              (session_id, data['word_id'], 1 if data['correct'] else 0)
+          )
+          
+          # Update word_reviews
+          cursor.execute('''
+              INSERT INTO word_reviews (word_id, correct_count, wrong_count)
+              VALUES (?, ?, ?)
+              ON CONFLICT(word_id) DO UPDATE SET
+              correct_count = correct_count + ?,
+              wrong_count = wrong_count + ?
+          ''', (
+              data['word_id'],
+              1 if data['correct'] else 0,
+              0 if data['correct'] else 1,
+              1 if data['correct'] else 0,
+              0 if data['correct'] else 1
+          ))
+          
+          app.db.commit()
+          return jsonify({
+              "success": True,
+              "word_id": data['word_id'],
+              "study_session_id": session_id,
+              "correct": data['correct']
+          }), 201
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
+      finally:
+          app.db.close()

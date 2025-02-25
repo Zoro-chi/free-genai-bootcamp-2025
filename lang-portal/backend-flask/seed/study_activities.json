@@ -1,3 +1,4 @@
 [
-  {"name": "Typing Tutor", "url": "http://localhost:8080", "preview_url": "/assets/study_activities/typing-tutor.png"}
+  {"name": "Typing Tutor", "url": "http://localhost:8080", "preview_url": "/assets/study_activities/typing-tutor.png"},
+  {"name": "Lang Portal", "url": "http://localhost:5173", "preview_url": ""}
 ]

@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, jsonify
 from flask_cors import CORS
 
 from lib.db import Db
@@ -54,7 +54,7 @@ def create_app(test_config=None):
     
     # In development, add localhost to allowed origins
     if app.debug:
-        allowed_origins.extend(["http://localhost:8080", "http://127.0.0.1:8080"])
+        allowed_origins.extend(["http://localhost:8080", "http://127.0.0.1:8080", "http://127.0.0.1:5173"])
     
     # Configure CORS with combined origins
     CORS(app, resources={
@@ -64,6 +64,11 @@ def create_app(test_config=None):
             "allow_headers": ["Content-Type", "Authorization"]
         }
     })
+    
+    # Define a route for the root URL
+    @app.route('/')
+    def index():
+        return jsonify({"message": "Welcome to the Language Portal API"})
 
     # Close database connection
     @app.teardown_appcontext

@@ -6,9 +6,9 @@ import {
   fetchGroupWords,
   type GroupDetails, 
   type StudySession,
-  type StudySessionSortKey,
   type Word 
 } from '../services/api'
+import { type StudySessionSortKey } from '../components/StudySessionsTable'
 import WordsTable, { type WordSortKey } from '../components/WordsTable'
 import StudySessionsTable from '../components/StudySessionsTable'
 import Pagination from '../components/Pagination'
@@ -22,7 +22,7 @@ export default function GroupShow() {
   const [studySessions, setStudySessions] = useState<StudySession[]>([])
   const [wordSortKey, setWordSortKey] = useState<WordSortKey>('kanji')
   const [wordSortDirection, setWordSortDirection] = useState<'asc' | 'desc'>('asc')
-  const [sessionSortKey, setSessionSortKey] = useState<StudySessionSortKey>('startTime')
+  const [sessionSortKey, setSessionSortKey] = useState<StudySessionSortKey>('start_time')
   const [sessionSortDirection, setSessionSortDirection] = useState<'asc' | 'desc'>('desc')
   const [wordsPage, setWordsPage] = useState(1)
   const [sessionsPage, setSessionsPage] = useState(1)

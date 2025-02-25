@@ -1,0 +1,12 @@
+2025-02-24 16:14:52,121 - MY_APP - Initializing Japanese Learning App...
+2025-02-24 16:14:52,177 - MY_APP - Entering render_setup_state
+2025-02-24 16:14:52,177 - MY_APP - No vocabulary loaded
+2025-02-24 16:15:33,636 - MY_APP - Initializing Japanese Learning App...
+2025-02-24 16:15:33,686 - MY_APP - Entering render_setup_state
+2025-02-24 16:15:33,686 - MY_APP - No vocabulary loaded
+2025-02-24 16:16:13,213 - MY_APP - Initializing Japanese Learning App...
+2025-02-24 16:16:13,214 - MY_APP - http://localhost:5000/api/groups/1/words/raw
+2025-02-24 16:16:13,239 - MY_APP - Response status: 403
+2025-02-24 16:16:13,240 - MY_APP - API request failed: 403
+2025-02-24 16:16:13,240 - MY_APP - Entering render_setup_state
+2025-02-24 16:16:13,241 - MY_APP - No vocabulary loaded
