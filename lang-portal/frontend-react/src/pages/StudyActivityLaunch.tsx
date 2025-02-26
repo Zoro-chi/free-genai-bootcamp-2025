@@ -67,7 +67,7 @@ export default function StudyActivityLaunch() {
     try {
       // Create a study session first
       const result = await createStudySession(parseInt(selectedGroup), launchData.activity.id);
-      const sessionId = result.session_id;
+      const sessionId = result.id;
       
       // Replace any instances of $group_id with the actual group id and add session_id
       const launchUrl = new URL(launchData.activity.launch_url);
@@ -82,7 +82,7 @@ export default function StudyActivityLaunch() {
     } catch (error) {
       console.error('Failed to launch activity:', error);
     }
-  }
+  };
 
   if (loading) {
     return <div className="text-center">Loading...</div>

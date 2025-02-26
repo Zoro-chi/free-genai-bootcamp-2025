@@ -45,7 +45,7 @@ class JapaneseWritingApp:
                 logger.error("Missing study session ID or current word")
                 return
 
-            url = f"http://localhost:5000/study_sessions/{self.study_session_id}/review"
+            url = f"http://127.0.0.1:5000/api/study_sessions/{self.study_session_id}/review"
             data = {
                 'word_id': self.current_word.get('id'),
                 'correct': is_correct
@@ -68,7 +68,7 @@ class JapaneseWritingApp:
         try:
             # Get group_id from environment variable or use default
             group_id = os.getenv('GROUP_ID', '1')
-            url = f"http://localhost:5000/api/groups/{group_id}/words/raw"
+            url = f"http://127.0.0.1:5000/api/groups/{group_id}/words/raw"
             logger.debug(f"Fetching vocabulary from: {url}")
             
             response = requests.get(url)

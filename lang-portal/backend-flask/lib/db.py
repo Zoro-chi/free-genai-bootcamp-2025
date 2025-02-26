@@ -139,6 +139,13 @@ class Db:
                     cursor=cursor,
                     data_json_path='seed/study_activities.json'
                 )
+                
+                # Create a study session
+                cursor.execute('''
+                    INSERT INTO study_sessions (group_id, study_activity_id)
+                    VALUES (1, 1), (2, 2)
+                ''')
+                self.get().commit()
             else:
                 app.logger.info('Database already contains data, skipping seed data insertion.')
 

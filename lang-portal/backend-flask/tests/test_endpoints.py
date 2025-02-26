@@ -1,7 +1,39 @@
 # import pytest
 # from flask import json
 
-# def test_pagination(client):
+# @pytest.fixture
+# def setup_database(client):
+#     # Create necessary data
+#     # Create groups
+#     group_data = {'name': 'Animals'}
+#     client.post('/groups', json=group_data)
+    
+#     # Create words
+#     word_data = {
+#         'kanji': '犬',
+#         'romaji': 'inu',
+#         'english': 'dog',
+#         'parts': '[]'
+#     }
+#     client.post('/words', json=word_data)
+    
+#     # Create study activities
+#     study_activity_data = {'name': 'Vocabulary Practice'}
+#     client.post('/api/study-activities', json=study_activity_data)
+    
+#     # Create study sessions
+#     study_session_data = {
+#         'study_activity_id': 1,
+#         'group_id': 1
+#     }
+#     client.post('/api/study-sessions', json=study_session_data)
+
+#     yield
+
+#     # Clean up the database if necessary
+#     # client.delete('/api/cleanup')
+
+# def test_pagination(client, setup_database):
 #     """Test pagination requirements"""
 #     response = client.get('/words?page=1&per_page=10')
 #     print("GET /words?page=1&per_page=10 response:", response.get_json())
@@ -11,7 +43,7 @@
 #     assert 'total_pages' in data
 #     assert len(data['words']) <= 10
 
-# def test_word_group_association(client):
+# def test_word_group_association(client, setup_database):
 #     """Test word-group associations"""
 #     # Create test data
 #     word_data = {
@@ -35,7 +67,7 @@
 #     print("POST /groups/:group_id/words/:word_id response:", response.get_json())
 #     assert response.status_code == 200
 
-# def test_study_session_tracking(client):
+# def test_study_session_tracking(client, setup_database):
 #     """Test study session tracking"""
 #     # Create test session
 #     session_data = {
@@ -59,7 +91,7 @@
 #     print("POST /api/study-sessions/:session_id/reviews response:", response.get_json())
 #     assert response.status_code == 201
 
-# def test_error_handling(client):
+# def test_error_handling(client, setup_database):
 #     """Test error responses"""
 #     # Test non-existent word
 #     response = client.get('/words/999999')
@@ -73,7 +105,7 @@
 #     assert response.status_code == 400
 #     assert response.content_type == 'application/json'
 
-# def test_groups_endpoints(client):
+# def test_groups_endpoints(client, setup_database):
 #     """Test all group-related endpoints return valid JSON"""
     
 #     # Test GET /groups
@@ -105,7 +137,7 @@
 #         assert response.content_type == 'application/json'
 #         assert 'study_sessions' in response.json
 
-# def test_words_endpoints(client):
+# def test_words_endpoints(client, setup_database):
 #     """Test all word-related endpoints return valid JSON"""
     
 #     # Test GET /words
@@ -125,7 +157,7 @@
 #         assert response.content_type == 'application/json'
 #         assert 'word' in response.json
 
-# def test_study_sessions_endpoints(client):
+# def test_study_sessions_endpoints(client, setup_database):
 #     """Test all study session-related endpoints return valid JSON"""
     
 #     # Test GET /api/study-sessions
@@ -140,7 +172,7 @@
 #     assert response.content_type == 'application/json'
 #     assert 'message' in response.json
 
-# def test_study_activities_endpoints(client):
+# def test_study_activities_endpoints(client, setup_database):
 #     """Test all study activity-related endpoints return valid JSON"""
     
 #     # Test GET /api/study-activities
@@ -172,7 +204,7 @@
 #         assert response.content_type == 'application/json'
 #         assert 'activity' in response.json
 
-# def test_dashboard_endpoints(client):
+# def test_dashboard_endpoints(client, setup_database):
 #     """Test all dashboard-related endpoints return valid JSON"""
     
 #     # Test GET /dashboard/recent-session
@@ -185,6 +217,8 @@
 #     print("GET /dashboard/stats response:", response.get_json())
 #     assert response.content_type == 'application/json'
 #     assert 'total_vocabulary' in response.json
+
+
 
 
 import pytest
@@ -360,6 +394,14 @@ def test_study_sessions_endpoints(client, setup_database):
     print("POST /api/study-sessions/reset response:", response.get_json())
     assert response.content_type == 'application/json'
     assert 'message' in response.json
+    
+def test_study_session_created_on_startup(client):
+    """Test that a study session is created on startup"""
+    response = client.get('/api/study-sessions')
+    data = response.get_json()
+    assert response.status_code == 200
+    assert 'items' in data
+    assert any(session['group_id'] == 1 and session['activity_id'] == 1 for session in data['items'])
 
 def test_study_activities_endpoints(client, setup_database):
     """Test all study activity-related endpoints return valid JSON"""
@@ -406,3 +448,39 @@ def test_dashboard_endpoints(client, setup_database):
     print("GET /dashboard/stats response:", response.get_json())
     assert response.content_type == 'application/json'
     assert 'total_vocabulary' in response.json
+
+def test_get_group_words_raw(client, setup_database):
+    """Test fetching raw words for a group"""
+    # Create test data
+    group_data = {'name': 'Test Group'}
+    word_data = {
+        'kanji': '猫',
+        'romaji': 'neko',
+        'english': 'cat',
+        'parts': '[]'
+    }
+    
+    # Create group and word
+    group_response = client.post('/groups', json=group_data)
+    word_response = client.post('/words', json=word_data)
+    
+    group_id = group_response.get_json()['id']
+    word_id = word_response.get_json()['id']
+    
+    # Associate word with group
+    client.post(f'/groups/{group_id}/words/{word_id}')
+    
+    # Fetch raw words for the group
+    response = client.get(f'/api/groups/{group_id}/words/raw')
+    print("GET /api/groups/:id/words/raw response:", response.get_json())
+    
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data['group_id'] == group_id
+    assert data['group_name'] == 'Test Group'
+    assert len(data['words']) == 1
+    assert data['words'][0]['id'] == word_id
+    assert data['words'][0]['kanji'] == '猫'
+    assert data['words'][0]['romaji'] == 'neko'
+    assert data['words'][0]['english'] == 'cat'
+    assert data['words'][0]['parts'] == []

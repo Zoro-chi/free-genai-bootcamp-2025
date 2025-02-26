@@ -38,7 +38,7 @@ class JapaneseWritingApp:
         try:
             # Get group_id from environment variable or use default
             group_id = os.getenv('GROUP_ID', '1')
-            url = f"http://localhost:5000/api/groups/{group_id}/words/raw"
+            url = f"http://127.0.0.1:5000/api/groups/{group_id}/words/raw"
             logger.debug(f"Fetching vocabulary from: {url}")
             
             response = requests.get(url)

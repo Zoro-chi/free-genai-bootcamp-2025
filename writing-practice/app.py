@@ -63,7 +63,7 @@ class JapaneseLearningApp:
                 return
                 
             # Make API request with the actual group_id
-            url = f'http://localhost:5000/api/groups/{group_id}/words/raw'
+            url = f'http://127.0.0.1:5000/api/groups/{group_id}/words/raw'
             logger.debug(url)
             response = requests.get(url)
             logger.debug(f"Response status: {response.status_code}")
