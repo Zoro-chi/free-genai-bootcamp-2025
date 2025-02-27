@@ -4,6 +4,7 @@ import json
 import random
 import logging
 from openai import OpenAI
+from manga_ocr import MangaOcr
 import os
 import dotenv
 import yaml
@@ -45,7 +46,8 @@ class JapaneseWritingApp:
                 logger.error("Missing study session ID or current word")
                 return
 
-            url = f"http://127.0.0.1:5000/api/study_sessions/{self.study_session_id}/review"
+            # Change from /review to /reviews to match the backend endpoint
+            url = f"http://127.0.0.1:5000/api/study-sessions/{self.study_session_id}/reviews"
             data = {
                 'word_id': self.current_word.get('id'),
                 'correct': is_correct
@@ -56,7 +58,7 @@ class JapaneseWritingApp:
             response = requests.post(url, json=data)
             logger.debug(f"Response status: {response.status_code}, content: {response.text}")
             
-            if response.status_code == 200:
+            if response.status_code == 201:  # Changed from 200 to 201 to match the backend response code
                 logger.info(f"Successfully submitted result for word {self.current_word.get('id')}")
             else:
                 logger.error(f"Failed to submit result. Status code: {response.status_code}")
@@ -106,7 +108,6 @@ class JapaneseWritingApp:
             # Initialize MangaOCR for transcription if not already initialized
             if self.mocr is None:
                 logger.info("Initializing MangaOCR")
-                from manga_ocr import MangaOcr
                 self.mocr = MangaOcr()
             
             # Save the sketch as a temporary file
@@ -136,7 +137,7 @@ class JapaneseWritingApp:
             prompts = load_prompts()
             
             # Compare transcription with target word
-            is_correct = transcription.strip() == self.current_word.get('japanese', '').strip()
+            is_correct = transcription.strip() == self.current_word.get('kanji', '').strip()
             result = "✓ Correct!" if is_correct else "✗ Incorrect"
             
             logger.debug(f"Current word: {self.current_word}")
@@ -221,4 +222,4 @@ def create_ui():
 
 if __name__ == "__main__":
     interface = create_ui()
-    interface.launch(server_name="0.0.0.0", server_port=8081)
+    interface.launch(server_name="0.0.0.0", server_port=8082)

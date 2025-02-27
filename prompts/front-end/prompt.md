@@ -86,7 +86,7 @@ The Launch button will open a new address in a new tab.
 Study activities are their own apps, but in order for them
 to launch they need to be provided a group_id
 
-eg. localhost:8081?group_id=4
+eg. localhost:8082?group_id=4
 
 This page requires no pagination because there is unlikely
 to be more than 20 possible study actvities

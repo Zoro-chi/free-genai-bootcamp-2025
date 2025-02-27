@@ -4,6 +4,7 @@ import json
 import random
 import logging
 from openai import OpenAI
+from manga_ocr import MangaOcr
 import os
 import dotenv
 import yaml
@@ -99,7 +100,6 @@ class JapaneseWritingApp:
             # Initialize MangaOCR for transcription if not already initialized
             if self.mocr is None:
                 logger.info("Initializing MangaOCR")
-                from manga_ocr import MangaOcr
                 self.mocr = MangaOcr()
             
             # Transcribe the image
@@ -233,4 +233,4 @@ def create_ui():
 
 if __name__ == "__main__":
     interface = create_ui()
-    interface.launch(server_name="0.0.0.0", server_port=8081)
+    interface.launch(server_name="0.0.0.0", server_port=8082)

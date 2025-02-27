@@ -32,9 +32,10 @@ def create_app(test_config=None):
     
     # Configure CORS
     CORS(app, resources={r"/*": {
-    "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8081", "http://127:0.0.1:8081"], 
+    "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8082", "http://127:0.0.1:8082"], 
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    "allow_headers": ["Content-Type", "Authorization"]
+    "allow_headers": ["Content-Type", "Authorization"],
+    
 }})
     
     # Define a route for the root URL

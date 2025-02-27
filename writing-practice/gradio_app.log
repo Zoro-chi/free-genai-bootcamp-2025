@@ -1,0 +1,34 @@
+2025-02-27 10:18:20,981 - DEBUG - Using session_id: 1
+2025-02-27 10:18:20,981 - DEBUG - Fetching vocabulary from: http://127.0.0.1:5000/api/groups/1/words/raw
+2025-02-27 10:18:20,988 - INFO - Loaded 60 words
+2025-02-27 10:18:54,527 - DEBUG - Getting random word
+2025-02-27 10:23:30,968 - DEBUG - Getting random word
+2025-02-27 10:34:02,876 - DEBUG - Fetching vocabulary from: http://127.0.0.1:5000/api/groups/1/words/raw
+2025-02-27 10:34:02,882 - INFO - Loaded 60 words
+2025-02-27 10:34:15,623 - DEBUG - Getting random word and generating sentence
+2025-02-27 10:34:15,624 - DEBUG - Generating sentence for word: 合う
+2025-02-27 10:34:18,430 - INFO - Generated sentence: 私たちのスケジュールが合う日に再度会いましょう。
+2025-02-27 10:37:37,516 - INFO - Initializing MangaOCR
+2025-02-27 10:41:26,690 - INFO - Transcribing image with MangaOCR
+2025-02-27 10:41:26,971 - DEBUG - Transcription result: ◆ＳｍａｒｔＰａｌｃａｌ
+2025-02-27 10:41:26,972 - INFO - Getting literal translation
+2025-02-27 10:41:28,964 - DEBUG - Translation: SmartPalcal
+2025-02-27 10:41:28,964 - INFO - Getting grade and feedback
+2025-02-27 10:41:32,874 - INFO - Grading complete: C
+2025-02-27 10:41:32,874 - DEBUG - Feedback: The student's Japanese writing does not match the target English sentence at all. The student wrote "SmartPalcal," which doesn't make sense in either English or Japanese. The correct translation of the target English sentence, "Let's meet again on a day when our schedules match," should be "私たちのスケジュールが合う日に再度会いましょう。" Please review the lesson materials and try again.
+2025-02-27 10:45:23,920 - DEBUG - Getting random word and generating sentence
+2025-02-27 10:45:23,921 - DEBUG - Generating sentence for word: 貸す
+2025-02-27 10:45:25,678 - INFO - Generated sentence: 私の車を貸すことは可能ですか？
+2025-02-27 10:46:05,629 - INFO - Transcribing image with MangaOCR
+2025-02-27 10:46:06,393 - DEBUG - Transcription result: ◆ＳｈａｒｔＲａｃｅｌＬｉｎｔｅｄ．
+2025-02-27 10:46:06,398 - INFO - Getting literal translation
+2025-02-27 10:46:07,890 - DEBUG - Translation: ◆ShartRaceLinted.
+2025-02-27 10:46:07,890 - INFO - Getting grade and feedback
+2025-02-27 10:46:11,835 - INFO - Grading complete: C
+2025-02-27 10:46:11,835 - DEBUG - Feedback: The sentence you wrote does not correspond to the target English sentence at all. It seems like you've written a random string of English words, not a Japanese sentence. The correct translation of "Can I borrow your car?" is "私の車を貸すことは可能ですか？". Please make sure to study the vocabulary and sentence structure necessary for this translation.
+2025-02-27 10:52:11,619 - DEBUG - Using session_id: 1
+2025-02-27 10:52:11,619 - DEBUG - Fetching vocabulary from: http://127.0.0.1:5000/api/groups/1/words/raw
+2025-02-27 10:52:11,625 - INFO - Loaded 60 words
+2025-02-27 11:00:52,638 - DEBUG - Using session_id: 1
+2025-02-27 11:00:52,638 - DEBUG - Fetching vocabulary from: http://127.0.0.1:5000/api/groups/1/words/raw
+2025-02-27 11:00:52,644 - INFO - Loaded 60 words
