@@ -2,6 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 services:
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+      - "9411:9411"
+    ipc: host
+    environment:
+      NO_PROXY: ${NO_PROXY}
+      HTTP_PROXY: ${HTTP_PROXY}
+      HTTPS_PROXY: ${HTTPS_PROXY}
+      COLLECTOR_ZIPKIN_HOST_PORT: 9411
+    restart: unless-stopped
   ollama-server:
     image: ollama/ollama
     container_name: ollama-server
@@ -13,6 +28,8 @@ services:
       HTTPS_PROXY: ${HTTPS_PROXY}
       LLM_MODEL_ID: ${LLM_MODEL_ID}
       HOST_IP: ${HOST_IP}
+    volumes:
+      - ./ollama-models:/root/.ollama  # Mount local directory to Ollama's model storage location
 
 networks:
   default:
