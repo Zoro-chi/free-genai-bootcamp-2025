@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+instructor
+duckduckgo-search
+pydantic
+httpx
+langchain
+pytest
+python-dotenv
+ollama
+nltk

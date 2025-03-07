@@ -17,3 +17,4 @@ venv.bak/
 .env
 
 opea-comps/ollama-models
+opea-comps/mega-service-new/.env
