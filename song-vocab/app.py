@@ -67,7 +67,7 @@ async def log_requests(request: Request, call_next):
         )
 
 @app.post("/api/agent", response_model=LyricsResponse)
-async def get_lyrics(request: MessageRequest):
+async def process_agent_request(request: MessageRequest):
     """
     Get song lyrics from the web using the agent.
     
@@ -90,7 +90,16 @@ async def get_lyrics(request: MessageRequest):
                 nltk.download(resource)
         
         result = await song_agent.process_lyrics_request(request.message_request)
-        return result
+        
+        # Correctly access dictionary keys with bracket notation
+        response = {
+            "lyrics": result["lyrics"],
+            "vocabulary": result["vocabulary"],
+            "lyrics_path": result["lyrics_path"],
+            "handler_id": result["handler_id"]  # Placed at the end of the response
+        }
+        
+        return response
     except Exception as e:
         logger.error(f"Error processing request: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error processing request: {str(e)}")
