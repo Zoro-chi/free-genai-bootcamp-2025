@@ -1,0 +1,24 @@
+# Narrative Moment Templates for SDXL
+
+## Primary Narrative Template
+A [BIBLICAL_EVENT] in contemporary Nigerian [SETTING_TYPE], featuring [BIBLICAL_CHARACTERS] [MAIN_ACTION] with [EMOTIONAL_IMPACT], [TIME_OF_DAY] creating [LIGHTING_EFFECT], witnesses showing expressions of [EMOTIONAL_REACTIONS], detailed cultural elements including [CULTURAL_DETAILS], [COMPOSITION_NOTES], inspired by [ARTISTIC_REFERENCE] with authentic Nigerian interpretation, photorealistic digital artwork, highly detailed [HIGHLIGHT_ELEMENTS], [QUALITY_ENHANCERS]
+
+## Parameters Guide:
+- BIBLICAL_EVENT: Feeding the 5000, Walking on Water, Healing the Blind Man, Raising of Lazarus, etc.
+- SETTING_TYPE: community center, outdoor gathering, coastal waters, family home, etc.
+- BIBLICAL_CHARACTERS: Jesus, Peter, Mary Magdalene, Thomas, John, etc.
+- MAIN_ACTION: distributing bread and fish, walking across water, healing the sick, raising the dead, etc.
+- EMOTIONAL_IMPACT: creating wonder, inspiring awe, conveying hope, showing compassion, etc.
+- TIME_OF_DAY: morning, afternoon, evening, night
+- LIGHTING_EFFECT: warm sunlight, dramatic rays through windows, moonlight on water, golden hour glow, etc.
+- EMOTIONAL_REACTIONS: wonder and gratitude, astonishment, amazement and joy, fear turning to awe, etc.
+- CULTURAL_DETAILS: colorful fabric patterns, traditional vessels, architectural elements, contemporary clothing with traditional motifs, etc.
+- COMPOSITION_NOTES: wide-angle perspective, intimate framing, dynamic viewpoint, balanced arrangement, etc.
+- ARTISTIC_REFERENCE: contemporary Nigerian artists, classical narrative paintings, documentary photography, etc.
+- HIGHLIGHT_ELEMENTS: facial expressions, environmental elements, water physics, emotional connections, etc.
+- QUALITY_ENHANCERS: cinematic quality, 8k resolution, professional lighting, film-like color grading, etc.
+
+## Examples:
+1. A Feeding of the 5000 in contemporary Nigerian outdoor setting, featuring Jesus distributing bread and fish to a gathered crowd with creating wonder and gratitude, afternoon creating warm golden sunlight across the scene, witnesses showing expressions of amazement and appreciation, detailed cultural elements including colorful ankara fabric patterns and traditional calabash serving vessels, wide-angle composition capturing the entire gathering, inspired by documentary photography with artistic enhancement, photorealistic digital artwork, highly detailed facial expressions showing diverse emotions, cinematic quality with professional lighting
+
+2. A Healing of the Paralytic in contemporary Nigerian Yoruba community center, featuring Jesus helping a paralyzed man stand with conveying hope and renewal, morning creating dramatic light rays through windows, witnesses showing expressions of amazement and joy, detailed cultural elements including modern architectural details with traditional patterns and contemporary clothing with cultural motifs, intimate framing focusing on the central interaction, inspired by classical narrative paintings with Nigerian cultural sensitivity, photorealistic digital artwork, highly detailed emotional connections between figures, film-like color grading with emphasis on warm tones

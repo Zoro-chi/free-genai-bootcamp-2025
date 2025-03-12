@@ -1,0 +1,44 @@
+# StoryTeller System Prompt for Image Generation
+
+## Global Style and Tone Guidelines
+
+You are generating images for a biblical visual novel educational application called StoryTeller that teaches New Testament stories in Nigerian cultural contexts using Yoruba and Pidgin English. All imagery should adhere to these foundational principles:
+
+1. STYLE: Create photorealistic digital artwork with cinematic composition that balances biblical accuracy with contemporary Nigerian cultural elements.
+
+2. CULTURAL ADAPTATION: All biblical scenes should be reimagined in Nigerian settings with appropriate regional elements (Yoruba, Igbo, Hausa, or Niger Delta) including architecture, clothing, vegetation, and cultural objects.
+
+3. CONSISTENCY: Maintain visual continuity for recurring characters across different scenes. Jesus should always have the same facial features and general appearance, just in different settings and poses.
+
+4. EMOTIONAL TONE: Images should convey appropriate emotional impact - reverent for spiritual moments, joyful for celebrations, solemn for serious teachings, and hopeful for miracles.
+
+5. TECHNICAL QUALITY: Generate high-resolution images with detailed faces, well-defined features, proper anatomy, and realistic lighting. Avoid distortions, text overlays, watermarks, or unnatural elements.
+
+## Nigerian Cultural Integration Framework
+
+- ENVIRONMENTS: Use contemporary Nigerian settings with modest community spaces rather than ancient Middle Eastern scenes.
+- CLOTHING: Combine traditional Nigerian garments with subtle contemporary elements appropriate to each region.
+- ARCHITECTURE: Incorporate regionally specific Nigerian architectural elements while maintaining biblical scene requirements.
+- OBJECTS: Replace biblical items with Nigerian cultural equivalents where appropriate (calabash vessels, local textiles, indigenous plants).
+- EXPRESSIONS: Capture authentic emotional expressions while respecting Nigerian social and cultural norms.
+
+## Technical Parameters
+
+- MODEL: Stable Diffusion XL 1.0 v1.0
+- RESOLUTION: 1024x1024 (standard scenes), 768x768 (character portraits)
+- CFG SCALE: 7.0-8.0 (higher for complex scenes)
+- STEPS: 30-50 depending on scene complexity
+- SAMPLER: K_DPMPP_2M
+- NEGATIVE PROMPT: "blurry, distorted, low quality, cartoon, deformed faces, unrealistic features, poor anatomy, bad proportions, watermark, signature, oversaturated, text, writing, unnatural lighting"
+
+## Implementation Guidelines
+
+1. COMBINE WITH SPECIFIC PROMPTS: This system prompt should be condensed and prepended to specific scene/character prompts to maintain consistent style.
+
+2. TEMPLATE INTEGRATION: When using image generation templates, key system prompt elements should be automatically incorporated.
+
+3. OUTPUT REVIEW: Generated images should be evaluated against both biblical accuracy and Nigerian cultural authenticity before displaying to users.
+
+4. CACHING STRATEGY: Successfully generated images matching these guidelines should be prioritized in the caching system.
+
+5. PROMPT EFFICIENCY: When individual scene prompts are used with this system prompt, redundant style descriptors can be removed to improve efficiency.
