@@ -1,7 +1,7 @@
-# Scene Setting Templates for SDXL
+# Scene Setting Templates for Nova Canvas
 
 ## Primary Scene Template
-[SCENE_NAME] set in contemporary Nigerian [REGION] environment, featuring [BIBLICAL_CHARACTERS] [ACTION_DESCRIPTION], [TIME_OF_DAY] with [LIGHTING_DETAILS], [EMOTIONAL_ATMOSPHERE] with observers showing [OBSERVER_REACTIONS], cultural elements including [CULTURAL_DETAILS], inspired by [ARTISTIC_STYLE] but with authentic Nigerian interpretation, highly detailed digital art, photorealistic quality, [QUALITY_ENHANCERS]
+[SCENE_NAME] set in contemporary Nigerian [REGION] environment, featuring [BIBLICAL_CHARACTERS] [ACTION_DESCRIPTION], [TIME_OF_DAY] with [LIGHTING_DETAILS], [EMOTIONAL_ATMOSPHERE] with observers showing [OBSERVER_REACTIONS], cultural elements including [CULTURAL_DETAILS], inspired by [ARTISTIC_STYLE] but with authentic Nigerian interpretation, photorealistic image, [QUALITY_ENHANCERS]
 
 ## Parameters Guide:
 - SCENE_NAME: Sermon on the Mount, Last Supper, Garden of Gethsemane, Crucifixion, etc.
@@ -17,6 +17,6 @@
 - QUALITY_ENHANCERS: 8k resolution, cinematic composition, professional lighting, etc.
 
 ## Examples:
-1. Sermon on the Mount set in contemporary Nigerian Yoruba environment, featuring Jesus teaching his disciples and followers, afternoon with golden sunlight filtering through acacia trees, inspirational atmosphere with observers showing expressions of deep interest, cultural elements including colorful traditional fabrics and carved wooden seating, inspired by Nigerian narrative paintings with realistic interpretation, highly detailed digital art, photorealistic quality, 8k resolution, vibrant yet balanced colors
+1. Sermon on the Mount set in contemporary Nigerian Yoruba environment, featuring Jesus teaching his disciples and followers, afternoon with golden sunlight filtering through acacia trees, inspirational atmosphere with observers showing expressions of deep interest, cultural elements including colorful traditional fabrics and carved wooden seating, inspired by Nigerian narrative paintings with realistic interpretation, photorealistic image, high quality photograph, vibrant yet balanced colors
 
-2. Last Supper set in contemporary Nigerian Niger Delta environment, featuring Jesus and his twelve disciples sharing their final meal together, evening with warm lamp light creating intimate shadows, solemn atmosphere with disciples showing expressions of concern and confusion, cultural elements including traditional Nigerian foods on low wooden table and architectural details with local patterns, inspired by classical religious art with authentic Nigerian interpretation, highly detailed digital art, photorealistic quality, cinematic composition with dramatic lighting
+2. Last Supper set in contemporary Nigerian Niger Delta environment, featuring Jesus and his twelve disciples sharing their final meal together, evening with warm lamp light creating intimate shadows, solemn atmosphere with disciples showing expressions of concern and confusion, cultural elements including traditional Nigerian foods on low wooden table and architectural details with local patterns, inspired by classical religious art with authentic Nigerian interpretation, photorealistic image, cinematic composition with dramatic lighting

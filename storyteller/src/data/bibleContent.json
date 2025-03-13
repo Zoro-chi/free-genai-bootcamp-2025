@@ -1,0 +1,104 @@
+{
+  "John-1-english": {
+    "book": "John",
+    "chapter": 1,
+    "verses": [
+      { "number": 1, "text": "In the beginning was the Word, and the Word was with God, and the Word was God." },
+      { "number": 2, "text": "He was with God in the beginning." },
+      { "number": 3, "text": "Through him all things were made; without him nothing was made that has been made." },
+      { "number": 4, "text": "In him was life, and that life was the light of all mankind." },
+      { "number": 5, "text": "The light shines in the darkness, and the darkness has not overcome it." },
+      { "number": 6, "text": "There was a man sent from God whose name was John." },
+      { "number": 7, "text": "He came as a witness to testify concerning that light, so that through him all might believe." },
+      { "number": 8, "text": "He himself was not the light; he came only as a witness to the light." },
+      { "number": 9, "text": "The true light that gives light to everyone was coming into the world." },
+      { "number": 10, "text": "He was in the world, and though the world was made through him, the world did not recognize him." }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [1, 5],
+        "event": "Creation narrative",
+        "characters": "Jesus as the Word",
+        "setting": "Divine realm"
+      },
+      {
+        "verseRange": [6, 10],
+        "event": "John's testimony",
+        "characters": "John the Baptist",
+        "setting": "Wilderness"
+      }
+    ]
+  },
+  "Matthew-5-english": {
+    "book": "Matthew",
+    "chapter": 5,
+    "verses": [
+      { "number": 1, "text": "Now when Jesus saw the crowds, he went up on a mountainside and sat down. His disciples came to him," },
+      { "number": 2, "text": "and he began to teach them. He said:" },
+      { "number": 3, "text": "\"Blessed are the poor in spirit, for theirs is the kingdom of heaven.\"" },
+      { "number": 4, "text": "\"Blessed are those who mourn, for they will be comforted.\"" },
+      { "number": 5, "text": "\"Blessed are the meek, for they will inherit the earth.\"" },
+      { "number": 6, "text": "\"Blessed are those who hunger and thirst for righteousness, for they will be filled.\"" },
+      { "number": 7, "text": "\"Blessed are the merciful, for they will be shown mercy.\"" },
+      { "number": 8, "text": "\"Blessed are the pure in heart, for they will see God.\"" },
+      { "number": 9, "text": "\"Blessed are the peacemakers, for they will be called children of God.\"" },
+      { "number": 10, "text": "\"Blessed are those who are persecuted because of righteousness, for theirs is the kingdom of heaven.\"" }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [1, 10],
+        "event": "Sermon on the Mount",
+        "characters": "Jesus teaching disciples",
+        "setting": "Mountainside"
+      }
+    ]
+  },
+  "Mark-6-english": {
+    "book": "Mark",
+    "chapter": 6,
+    "verses": [
+      { "number": 35, "text": "By this time it was late in the day, so his disciples came to him. \"This is a remote place,\" they said, \"and it's already very late.\"" },
+      { "number": 36, "text": "\"Send the people away so that they can go to the surrounding countryside and villages and buy themselves something to eat.\"" },
+      { "number": 37, "text": "But he answered, \"You give them something to eat.\" They said to him, \"That would take more than half a year's wages! Are we to go and spend that much on bread and give it to them to eat?\"" },
+      { "number": 38, "text": "\"How many loaves do you have?\" he asked. \"Go and see.\" When they found out, they said, \"Five—and two fish.\"" },
+      { "number": 39, "text": "Then Jesus directed them to have all the people sit down in groups on the green grass." },
+      { "number": 40, "text": "So they sat down in groups of hundreds and fifties." },
+      { "number": 41, "text": "Taking the five loaves and the two fish and looking up to heaven, he gave thanks and broke the loaves. Then he gave them to his disciples to distribute to the people. He also divided the two fish among them all." },
+      { "number": 42, "text": "They all ate and were satisfied," },
+      { "number": 43, "text": "and the disciples picked up twelve basketfuls of broken pieces of bread and fish." },
+      { "number": 44, "text": "The number of the men who had eaten was five thousand." }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [35, 44],
+        "event": "Feeding the 5000",
+        "characters": "Jesus with disciples and crowd",
+        "setting": "Grassy countryside"
+      }
+    ]
+  },
+  "Luke-15-english": {
+    "book": "Luke",
+    "chapter": 15,
+    "verses": [
+      { "number": 11, "text": "Jesus continued: \"There was a man who had two sons.\"" },
+      { "number": 12, "text": "\"The younger one said to his father, 'Father, give me my share of the estate.' So he divided his property between them.\"" },
+      { "number": 13, "text": "\"Not long after that, the younger son got together all he had, set off for a distant country and there squandered his wealth in wild living.\"" },
+      { "number": 14, "text": "\"After he had spent everything, there was a severe famine in that whole country, and he began to be in need.\"" },
+      { "number": 15, "text": "\"So he went and hired himself out to a citizen of that country, who sent him to his fields to feed pigs.\"" },
+      { "number": 16, "text": "\"He longed to fill his stomach with the pods that the pigs were eating, but no one gave him anything.\"" },
+      { "number": 17, "text": "\"When he came to his senses, he said, 'How many of my father's hired servants have food to spare, and here I am starving to death!\"" },
+      { "number": 18, "text": "\"I will set out and go back to my father and say to him: Father, I have sinned against heaven and against you.\"" },
+      { "number": 19, "text": "\"I am no longer worthy to be called your son; make me like one of your hired servants.'\"" },
+      { "number": 20, "text": "\"So he got up and went to his father. But while he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.\"" }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [11, 20],
+        "event": "Prodigal Son's Return",
+        "characters": "Father and returning son",
+        "setting": "Family home"
+      }
+    ]
+  }
+}

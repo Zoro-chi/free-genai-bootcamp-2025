@@ -1,0 +1,40 @@
+{
+  "name": "storyteller",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Biblical visual novel in Nigerian languages with AI-generated imagery",
+  "author": "StoryTeller Team",
+  "license": "MIT",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css,md}\""
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.450.0",
+    "axios": "^1.5.1",
+    "framer-motion": "^10.16.4",
+    "next": "^13.5.6",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.11.0",
+    "react-markdown": "^8.0.7",
+    "tailwindcss": "^3.3.3",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/node": "^20.8.9",
+    "@types/react": "^18.2.33",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.51.0",
+    "eslint-config-next": "13.5.6",
+    "eslint-config-prettier": "^9.0.0",
+    "postcss": "^8.4.31",
+    "prettier": "^3.0.3"
+  }
+}

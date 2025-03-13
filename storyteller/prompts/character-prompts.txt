@@ -1,4 +1,4 @@
-# Character Portrait Templates for SDXL
+# Character Portrait Templates for Nova Canvas
 
 ## Primary Character Template
 Portrait of [CHARACTER_NAME] with [PHYSICAL_TRAITS] in contemporary Nigerian [REGION] attire with [CLOTHING_DETAILS], [EMOTION] expression, detailed cultural elements including [CULTURAL_ELEMENTS], [FACE_DETAILS], photorealistic, [LIGHTING_DESCRIPTION], professional photography style, highly detailed, [QUALITY_ENHANCERS]
@@ -15,6 +15,6 @@ Portrait of [CHARACTER_NAME] with [PHYSICAL_TRAITS] in contemporary Nigerian [RE
 - QUALITY_ENHANCERS: cinematic quality, 8k resolution, sharp focus, etc.
 
 ## Examples:
-1. Portrait of Jesus with gentle features in contemporary Nigerian Yoruba attire with subtle adire patterns, compassionate expression, detailed cultural elements including beaded accessories and embroidered collar, well-defined features and short beard, photorealistic, soft natural lighting against neutral background, professional photography style, highly detailed, cinematic quality
+1. Portrait of Jesus with gentle features in contemporary Nigerian Yoruba attire with subtle adire patterns, compassionate expression, detailed cultural elements including beaded accessories and embroidered collar, well-defined features and short beard, photorealistic, soft natural lighting against neutral background, professional photography style, highly detailed, high quality photograph
 
-2. Portrait of Paul with distinguished scholarly features in contemporary Nigerian Hausa embroidered cap and flowing robe with geometric patterns, thoughtful expression, detailed cultural elements including writing implements and traditional scrolls, intense eyes and defined brow, photorealistic, directional lighting creating shadows, professional portrait photography, highly detailed, 8k resolution
+2. Portrait of Paul with distinguished scholarly features in contemporary Nigerian Hausa embroidered cap and flowing robe with geometric patterns, thoughtful expression, detailed cultural elements including writing implements and traditional scrolls, intense eyes and defined brow, photorealistic, directional lighting creating shadows, professional portrait photography, highly detailed, ultra realistic

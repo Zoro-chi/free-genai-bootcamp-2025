@@ -4,7 +4,7 @@
 
 You are generating images for a biblical visual novel educational application called StoryTeller that teaches New Testament stories in Nigerian cultural contexts using Yoruba and Pidgin English. All imagery should adhere to these foundational principles:
 
-1. STYLE: Create photorealistic digital artwork with cinematic composition that balances biblical accuracy with contemporary Nigerian cultural elements.
+1. STYLE: Create photorealistic image with cinematic composition that balances biblical accuracy with contemporary Nigerian cultural elements.
 
 2. CULTURAL ADAPTATION: All biblical scenes should be reimagined in Nigerian settings with appropriate regional elements (Yoruba, Igbo, Hausa, or Niger Delta) including architecture, clothing, vegetation, and cultural objects.
 
@@ -24,12 +24,10 @@ You are generating images for a biblical visual novel educational application ca
 
 ## Technical Parameters
 
-- MODEL: Stable Diffusion XL 1.0 v1.0
+- MODEL: Amazon Bedrock Nova Canvas
 - RESOLUTION: 1024x1024 (standard scenes), 768x768 (character portraits)
-- CFG SCALE: 7.0-8.0 (higher for complex scenes)
-- STEPS: 30-50 depending on scene complexity
-- SAMPLER: K_DPMPP_2M
-- NEGATIVE PROMPT: "blurry, distorted, low quality, cartoon, deformed faces, unrealistic features, poor anatomy, bad proportions, watermark, signature, oversaturated, text, writing, unnatural lighting"
+- QUALITY: High
+- NEGATIVE PROMPT: "blurry, distorted, low quality, cartoon, deformed faces, unrealistic features, poor anatomy, bad proportions, watermark, signature, oversaturated, text, writing, unnatural lighting, digital art style, illustration, painting"
 
 ## Implementation Guidelines
 
