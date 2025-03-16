@@ -19,13 +19,34 @@
         "verseRange": [1, 5],
         "event": "Creation narrative",
         "characters": "Jesus as the Word",
-        "setting": "Divine realm"
+        "setting": "Divine realm",
+        "imageKey": "john-1-creation"
       },
       {
         "verseRange": [6, 10],
         "event": "John's testimony",
         "characters": "John the Baptist",
-        "setting": "Wilderness"
+        "setting": "Wilderness",
+        "imageKey": "john-1-john-baptist"
+      }
+    ]
+  },
+  "Matthew-1-english": {
+    "book": "Matthew",
+    "chapter": 1,
+    "verses": [
+      { "number": 1, "text": "This is the genealogy of Jesus the Messiah the son of David, the son of Abraham:" },
+      { "number": 2, "text": "Abraham was the father of Isaac, Isaac the father of Jacob, Jacob the father of Judah and his brothers," },
+      { "number": 24, "text": "When Joseph woke up, he did what the angel of the Lord had commanded him and took Mary home as his wife." },
+      { "number": 25, "text": "But he did not consummate their marriage until she gave birth to a son. And he gave him the name Jesus." }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [18, 25],
+        "event": "Birth of Jesus",
+        "characters": "Joseph, Mary and Angel",
+        "setting": "Home in Bethlehem",
+        "imageKey": "matthew-1-birth"
       }
     ]
   },
@@ -49,7 +70,32 @@
         "verseRange": [1, 10],
         "event": "Sermon on the Mount",
         "characters": "Jesus teaching disciples",
-        "setting": "Mountainside"
+        "setting": "Mountainside",
+        "imageKey": "matthew-5-sermon" 
+      }
+    ]
+  },
+  "Matthew-14-english": {
+    "book": "Matthew",
+    "chapter": 14,
+    "verses": [
+      { "number": 13, "text": "When Jesus heard what had happened, he withdrew by boat privately to a solitary place. Hearing of this, the crowds followed him on foot from the towns." },
+      { "number": 14, "text": "When Jesus landed and saw a large crowd, he had compassion on them and healed their sick." },
+      { "number": 15, "text": "As evening approached, the disciples came to him and said, \"This is a remote place, and it's already getting late. Send the crowds away, so they can go to the villages and buy themselves some food.\"" },
+      { "number": 16, "text": "Jesus replied, \"They do not need to go away. You give them something to eat.\"" },
+      { "number": 17, "text": "\"We have here only five loaves of bread and two fish,\" they answered." },
+      { "number": 18, "text": "\"Bring them here to me,\" he said." },
+      { "number": 19, "text": "And he directed the people to sit down on the grass. Taking the five loaves and the two fish and looking up to heaven, he gave thanks and broke the loaves. Then he gave them to the disciples, and the disciples gave them to the people." },
+      { "number": 20, "text": "They all ate and were satisfied, and the disciples picked up twelve basketfuls of broken pieces that were left over." },
+      { "number": 21, "text": "The number of those who ate was about five thousand men, besides women and children." }
+    ],
+    "keyScenes": [
+      {
+        "verseRange": [15, 21],
+        "event": "Feeding the 5000",
+        "characters": "Jesus and disciples with crowd",
+        "setting": "Grassy field",
+        "imageKey": "matthew-14-feeding"
       }
     ]
   },
@@ -73,7 +119,8 @@
         "verseRange": [35, 44],
         "event": "Feeding the 5000",
         "characters": "Jesus with disciples and crowd",
-        "setting": "Grassy countryside"
+        "setting": "Grassy countryside",
+        "imageKey": "mark-6-feeding-5000"
       }
     ]
   },
@@ -97,7 +144,8 @@
         "verseRange": [11, 20],
         "event": "Prodigal Son's Return",
         "characters": "Father and returning son",
-        "setting": "Family home"
+        "setting": "Family home",
+        "imageKey": "luke-15-prodigal-son-return"
       }
     ]
   }
