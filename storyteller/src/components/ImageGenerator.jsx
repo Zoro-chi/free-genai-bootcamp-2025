@@ -13,13 +13,27 @@ const ImageGenerator = ({
   language = 'english', 
   region = 'Yoruba',
   book,
-  chapter
+  chapter,
+  fixedHeight = false // Add new prop for fixed height
 }) => {
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imageSource, setImageSource] = useState('pregenerated'); // 'pregenerated' or 'generated'
   const [isZoomed, setIsZoomed] = useState(false);
+  
+  // Define fixed height styles
+  const imageContainerStyle = fixedHeight ? {
+    height: '400px',    // Fixed height for the container
+    overflow: 'hidden', // Hide overflow
+    position: 'relative'
+  } : {};
+  
+  const imageStyle = fixedHeight ? {
+    objectFit: 'cover',
+    width: '100%',
+    height: '100%'
+  } : {};
   
   useEffect(() => {
     const loadImage = async () => {
@@ -103,21 +117,23 @@ const ImageGenerator = ({
             </div>
           )}
           
-          <div className="relative group">
+          <div className="relative group" style={imageContainerStyle}>
             {imageSource === 'pregenerated' ? (
               <Image 
                 src={image} 
                 alt={`${biblicalEvent || ''} ${characters || ''}`}
                 width={500}
                 height={500}
-                className="w-full scene-image object-cover aspect-[4/3]" 
+                className="scene-image object-cover" 
+                style={imageStyle}
                 priority
               />
             ) : (
               <img 
                 src={image} 
                 alt={`${biblicalEvent || ''} ${characters || ''}`}
-                className="w-full scene-image object-cover aspect-[4/3]" 
+                className="scene-image object-cover" 
+                style={imageStyle}
               />
             )}
             

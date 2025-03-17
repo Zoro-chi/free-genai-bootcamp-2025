@@ -135,13 +135,8 @@ export default function TestPromptsPage() {
   };
   
   return (
-    <div className="App">
-      <header className="bg-blue-700 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold">StoryTeller</Link>
-          <div className="text-sm">Prompt Testing</div>
-        </div>
-      </header>
+    <div className="App min-h-screen">
+      {/* Header is now in layout.jsx */}
       
       <main className="container mx-auto my-8 px-4">
         <h1 className="text-3xl font-bold mb-6">Prompt Testing Utility</h1>

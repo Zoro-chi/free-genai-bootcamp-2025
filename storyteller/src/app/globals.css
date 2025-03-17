@@ -6,35 +6,116 @@
   --font-inter: var(--font-inter);
   --font-lora: var(--font-lora);
   --font-montserrat: var(--font-montserrat);
+  --font-dancing-script: var(--font-dancing-script);
+  
+  /* Biblical theme colors */
+  --parchment: #f5f1e6;
+  --scroll-brown: #d2b48c;
+  --ink-dark: #3a3224;
+  --gold-accent: #d4af37;
+  --royal-blue: #1e3a8a;
+  --deep-red: #8b0000;
+  --olive-green: #556b2f;
 }
 
 body {
   margin: 0;
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--font-lora), Georgia, serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #333;
-  background-color: #f9f9f9;
+  color: var(--ink-dark);
+  background-color: var(--parchment);
+  background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d2b48c' fill-opacity='0.2'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-montserrat), sans-serif;
+  font-family: var(--font-montserrat), serif;
   font-weight: 600;
+  color: var(--royal-blue);
 }
 
 .verse {
   cursor: pointer;
   transition: background-color 0.2s;
   border-radius: 0.25rem;
-  padding: 0.25rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px solid rgba(210, 180, 140, 0.3);
+  position: relative;
 }
 
 .verse:hover {
-  background-color: rgba(254, 243, 199, 0.5);
+  background-color: rgba(210, 180, 140, 0.15);
 }
 
+/* First letter styling to mimic illuminated manuscripts */
+.verse-text::first-letter {
+  font-size: 1.3em;
+  color: var(--deep-red);
+  font-weight: 600;
+}
+
+.verse-number {
+  color: var(--gold-accent);
+  background: var(--ink-dark);
+  border-radius: 50%;
+  width: 1.8rem;
+  height: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+}
+
+/* Biblical decorative elements */
+.chapter-divider {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.chapter-divider::before,
+.chapter-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--scroll-brown);
+}
+
+.chapter-divider::before {
+  margin-right: 1rem;
+}
+
+.chapter-divider::after {
+  margin-left: 1rem;
+}
+
+.bible-paper {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1), 0 2px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(210, 180, 140, 0.5);
+  overflow: hidden; /* Prevent content overflow */
+  height: 100%; /* Make sure it fills container height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Story card styling */
+.story-card {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Add subtle gradient to the cards */
+.story-card .bg-white {
+  background-image: linear-gradient(to right, rgba(210, 180, 140, 0.05) 0%, rgba(210, 180, 140, 0) 20%, rgba(210, 180, 140, 0) 80%, rgba(210, 180, 140, 0.05) 100%);
+}
+
+/* App styling */
 .App {
   min-height: 100vh;
   display: flex;
@@ -47,8 +128,58 @@ h1, h2, h3, h4, h5, h6 {
 
 .scene-image {
   transition: transform 0.3s ease;
+  border: 4px solid var(--scroll-brown);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .scene-image:hover {
   transform: scale(1.02);
 }
+
+/* Navigation styling */
+.biblical-select {
+  background-color: white;
+  border: 2px solid var(--scroll-brown);
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23d2b48c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+  padding-right: 2rem;
+}
+
+.biblical-btn {
+  background-color: var(--scroll-brown);
+  color: var(--ink-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  border: 1px solid rgba(58, 50, 36, 0.2);
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.biblical-btn:hover {
+  background-color: var(--gold-accent);
+  transform: translateY(-1px);
+  cursor: pointer;
+}
+
+.biblical-header {
+  background-color: var(--ink-dark);und-color: var(--royal-blue);
+  border-bottom: 4px solid var(--gold-accent);
+  margin: 0;
+  padding: 0.5rem;
+  top: 0;
+  width: 100%;
+  font-family: 'dancing-script', cursive;
+  text-align: center;
+
+}
+
+.font-dancing-script {
+  font-family: var(--font-dancing-script), cursive;
+}
+

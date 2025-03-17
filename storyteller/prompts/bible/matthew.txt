@@ -1,0 +1,83 @@
+# Gospel of Matthew Prompts
+
+These prompts are organized by scene type and chapter for the Gospel of Matthew with Nigerian cultural adaptation. They follow the templates defined in our prompt files and are ready for use with Amazon Nova Canvas.
+
+## Character Portraits
+
+### Jesus
+Portrait of Jesus with gentle yet authoritative features in contemporary Nigerian Yoruba attire with subtle adire patterns and embroidery, compassionate expression with piercing gaze, detailed cultural elements including beaded accessories and symbolic staff, well-defined features with short beard and distinct Nigerian facial characteristics, photorealistic, soft golden hour lighting creating warm highlights, professional photography style, highly detailed, ultra realistic photograph
+
+### Disciples
+Portrait of Matthew the tax collector with thoughtful features in contemporary Nigerian Igbo business attire with subtle traditional patterns, intelligent expression showing wisdom, detailed cultural elements including writing implements and record books, well-defined mature face with observant eyes, photorealistic, professional lighting with soft shadows, studio portrait style, highly detailed, high quality photograph
+
+Portrait of Peter with weathered fisherman features in contemporary Nigerian Niger Delta attire with earthy tones and functional design, determined expression showing both strength and vulnerability, detailed cultural elements including fishing accessories and symbolic materials, strong face with expressive eyes and short beard, photorealistic, natural outdoor lighting with water reflections, documentary style portrait, highly detailed, sharp focus photograph
+
+### John the Baptist
+Portrait of John the Baptist with rugged ascetic features in simple Nigerian rural attire with natural fabric and minimal ornamentation, intense prophetic expression conveying urgency, detailed cultural elements including symbolic items of wilderness living, weather-worn face with wild hair and intense gaze, photorealistic, dramatic side lighting creating deep shadows, environmental portrait style, highly detailed, cinematic quality photograph
+
+### Religious Leaders
+Portrait of a Pharisee scholar with dignified features in elaborate contemporary Nigerian ceremonial attire with rich embroidery and status symbols, stern intellectual expression conveying authority, detailed cultural elements including religious texts and traditional academic symbols, distinguished face with well-groomed beard and scrutinizing gaze, photorealistic, formal indoor lighting highlighting ornate details, professional ceremonial portrait, highly detailed, sharp focus photograph
+
+## Settings
+
+### Mountain Setting (Sermon on the Mount)
+Nigerian hillside setting reimagined as Mount of Beatitudes, featuring gentle slopes with scattered acacia trees and flowering plants, late afternoon with golden sunlight streaming through clouds, peaceful atmosphere ideal for gathering and teaching, detailed cultural elements including colorful woven mats for seating and traditional sun shelters, wide vista of surrounding Nigerian countryside with distant villages, photorealistic image, high quality landscape photograph
+
+### Lakeside (Sea of Galilee)
+Nigerian lakeside setting reimagined as Sea of Galilee, featuring calm waters reflecting morning light with fishing boats tied at simple wooden docks, early morning with soft diffused lighting and gentle mist, tranquil atmosphere with subtle movement of water, detailed cultural elements including fishing nets drying on stands and local water plants, view of surrounding tropical vegetation and distant hills, photorealistic image, high quality serene landscape photograph
+
+### Teaching Venue (Village Gathering)
+Nigerian village gathering space reimagined as teaching venue, featuring semicircle wooden seating under large shade trees with colorful fabrics for protection from sun, midday with dappled light filtering through leaves, engaged atmosphere with people finding seats, detailed cultural elements including ornate wooden stools for dignitaries and traditional musical instruments at edges, intimate community setting with welcoming pathways and children playing at edges, photorealistic image, high quality environmental photograph
+
+### Temple Setting (Religious Space)
+Nigerian religious building reimagined as Jerusalem Temple, featuring ornate wooden structure with elaborate carvings and colorful Nigerian patterns replacing traditional Jewish symbols, morning light streaming through open windows creating sacred atmosphere, solemn reverent environment with areas for teaching and prayer, detailed cultural elements including ceremonial items adapted to Nigerian traditions and symbolic architectural features, impressive interior space with combined cultural aesthetics maintaining biblical significance, photorealistic image, high quality architectural photograph
+
+### Garden Setting (Gethsemane)
+Nigerian prayer garden reimagined as Gethsemane, featuring secluded grove of ancient trees with twisted trunks and low-hanging branches, evening twilight with soft blue shadows and hints of moonlight, contemplative atmosphere of solitude and emotional weight, detailed cultural elements including stone prayer benches and subtle boundary markers of sacred space, pathways worn by years of use leading to central clearing perfect for private prayer, photorealistic image, high quality atmospheric photograph
+
+## Narrative Scenes by Chapter Groups
+
+### Birth Narrative (Chapters 1-2)
+Birth scene in Nigerian family home, featuring Mary and Joseph with newborn Jesus in simple but dignified Nigerian home interior, warm lamplight creating intimate glow and casting soft shadows, atmosphere of wonder and quiet joy, detailed cultural elements including handwoven baby clothes and traditional Nigerian cradle, visitors bringing culturally appropriate gifts according to Nigerian customs, photorealistic image, highly detailed emotional connection between figures, high quality photograph with balanced composition
+
+Flight to Egypt reimagined in Nigerian context as family fleeing danger, featuring Joseph leading donkey carrying Mary and infant Jesus along rural Nigerian path, pre-dawn light with dramatic shadows and cool tones, atmosphere of urgency yet determination, detailed cultural elements including modest travel provisions and protective amulets typical of the region, surrounding environment showing transition between settlements suggesting long journey ahead, photorealistic image, emphasis on protective father figure and vulnerable family, high quality dramatic photograph
+
+### Ministry Beginnings (Chapters 3-4)
+Baptism at Nigerian river crossing, featuring Jesus standing in water with John the Baptist pouring water over his head from traditional calabash vessel, dawn light creating golden reflections on water surface with subtle light rays through trees, atmosphere of sacred significance and new beginning, detailed cultural elements including observers in traditional Nigerian attire along riverbank and symbolic water plants, emphasis on moment of divine connection with subtle environmental response, photorealistic image, high quality photograph with emphasis on water interaction and facial expressions
+
+Temptation scene in Nigerian wilderness landscape, featuring Jesus alone in harsh dry savannah with scattered acacia trees and rocky outcroppings, intense midday sun creating stark shadows and heat distortion, atmosphere of physical hardship and spiritual challenge, detailed cultural elements including harsh beauty of wilderness environment and subtle symbolic elements representing temptation appropriate to Nigerian context, emphasis on isolation and inner strength amid testing, photorealistic image, high quality atmospheric photograph with dramatic sky
+
+### Sermon on the Mount (Chapters 5-7)
+Sermon on the Mount in Nigerian hillside setting, featuring Jesus standing addressing seated crowd arranged in semi-circle on grassy slope, late afternoon golden sunlight bathing scene in warm light with long shadows, atmosphere of rapt attention and transformative teaching, detailed cultural elements including listeners in diverse Nigerian regional attire representing all ages and backgrounds, emphasis on Jesus' engaging teaching posture and crowd's varied reactions of wonder and reflection, photorealistic image, high quality photograph with balanced composition showing both teacher and community
+
+Teaching the Beatitudes in intimate Nigerian setting, featuring Jesus seated slightly elevated with small group of disciples and followers gathered closely around, morning light filtering through tree branches creating symbolic light patterns, atmosphere of personal instruction and life-changing wisdom, detailed cultural elements including disciples taking notes on local materials and expressions of growing understanding, emphasis on key disciples' faces showing realization of counter-cultural teaching, photorealistic image, high quality intimate photograph focusing on knowledge transmission
+
+### Miracles and Ministry (Chapters 8-9, 12, 14-15)
+Healing the paralytic in Nigerian community center, featuring Jesus helping disabled man stand with friends who brought him watching in amazement, dramatic light rays through windows illuminating central action, atmosphere of compassion and restoration, detailed cultural elements including traditional healing items and adaptive equipment used locally, emphasis on paralytic's expression changing from hopelessness to joyful disbelief, photorealistic image, high quality photograph focusing on physical transformation and communal witness
+
+Calming the storm on Nigerian lake, featuring Jesus standing confidently in small wooden fishing boat as terrified disciples brace against violent waves, dramatic storm lighting with dark clouds and rain being pushed back from their immediate vicinity, atmosphere of supernatural authority over natural elements, detailed cultural elements including traditional Nigerian fishing boat construction and emergency water management techniques, emphasis on contrast between Jesus' calm and disciples' fear, photorealistic image, high quality dramatic photograph with emphasis on water physics and emotional expressions
+
+Feeding the multitude with Nigerian food items, featuring Jesus blessing small meal of local fish and traditional breads as disciples prepare to distribute to seated crowd, late afternoon golden light across open gathering space, atmosphere of anticipation and growing wonder, detailed cultural elements including local food varieties and traditional Nigerian eating customs with people seated in family groups, emphasis on inadequate initial portions contrasting with abundance being created, photorealistic image, high quality photograph with focus on food details and community arrangement
+
+### Parables (Chapters 13, 18, 20, 21, 22, 25)
+Sower parable in Nigerian farm setting, featuring farmer scattering seeds by hand across diverse ground types from footpath to rocky soil to thorny patches to good earth, early morning light with dew still visible on plants, atmosphere of everyday work containing spiritual significance, detailed cultural elements including traditional Nigerian farming implements and locally appropriate crop types, emphasis on different soil conditions clearly visible in same frame showing environmental diversity, photorealistic image, high quality photograph with agricultural authenticity
+
+Nigerian family reunion scene reimagining Prodigal Son, featuring father embracing returning son at compound entrance with older brother watching from distance, golden sunset lighting creating emotional atmosphere and symbolic new beginning, atmosphere of forgiveness contrasting with tension, detailed cultural elements including traditional Nigerian family compound architecture and symbolic feast preparations visible in background, emphasis on father's expression of unconditional love and son's humble return posture, photorealistic image, high quality photograph with focus on emotional reunion moment
+
+Ten virgins parable with Nigerian wedding context, featuring five prepared attendants with glowing lamps contrasting with five unprepared with extinguished lamps, midnight scene with dramatic lamp lighting creating pools of light and shadow, atmosphere of urgency and consequence, detailed cultural elements including traditional Nigerian wedding attire adapted to biblical narrative and cultural symbols of preparation, emphasis on contrast between readiness and unpreparedness at critical moment, photorealistic image, high quality photograph with emphasis on light symbolism
+
+### Final Week (Chapters 21-27)
+Entry into city reimagined in Nigerian context, featuring Jesus riding donkey along path with excited crowd laying colorful Nigerian fabrics and palm branches before him, bright midday sunlight creating festive atmosphere with vibrant colors, atmosphere of celebration and anticipation, detailed cultural elements including traditional Nigerian welcome customs and celebratory postures, emphasis on humble transport contrasted with royal treatment by diverse crowd, photorealistic image, high quality photograph with emphasis on community participation and central figure humility
+
+Last Supper with Nigerian food elements, featuring Jesus with twelve disciples seated around low table with traditional Nigerian communal meal setting, evening with warm lamp light creating intimate atmosphere with symbolic shadows, atmosphere of solemn fellowship and foreboding, detailed cultural elements including locally appropriate food items served in traditional vessels and cultural eating customs, emphasis on Jesus breaking bread with profound expression and disciples' varied reactions, photorealistic image, high quality photograph with focus on shared meal symbolism
+
+Garden prayer scene in Nigerian context, featuring Jesus kneeling alone in anguished prayer while three disciples sleep at distance among garden trees, deep night with moonlight creating blue-toned illumination and deep shadows, atmosphere of spiritual crisis and isolation, detailed cultural elements including appropriate Nigerian prayer postures and subtle garden features with local plants, emphasis on Jesus' emotional expression conveying inner struggle while maintaining dignity, photorealistic image, high quality photograph with emphasis on isolation amid community
+
+Crucifixion scene handled with Nigerian cultural sensitivity, featuring central cross with Jesus silhouetted against dramatic sky with grieving figures at base, stormy afternoon light creating somber dramatic atmosphere with symbolic darkness, atmosphere of profound grief and world-changing sacrifice, detailed cultural elements including mourning customs appropriate to Nigerian context and subtle cultural symbols of death and transition, emphasis on dignity in suffering rather than graphic detail, photorealistic image, high quality photograph with respectful framing of sacred moment
+
+### Resurrection (Chapter 28)
+Resurrection morning at Nigerian garden tomb, featuring empty tomb entrance with burial cloths visible inside and angelic figure seated nearby as women approach with spices, early dawn light with golden rays breaking through trees and illuminating tomb entrance, atmosphere of confusion transforming to wonder, detailed cultural elements including appropriate Nigerian burial customs and spice vessels carried by women, emphasis on empty tomb as central element with witnesses' expressions showing transformative realization, photorealistic image, high quality photograph with symbolic light representing new beginning
+
+Great Commission scene on Nigerian hillside, featuring resurrected Jesus addressing kneeling disciples with gesture of sending forth, majestic morning light with subtle heavenly quality surrounding central figure, atmosphere of divine authority and human purpose, detailed cultural elements including disciples prepared for journey with traveling items appropriate to Nigerian missionary context, emphasis on Jesus' expression of empowerment and disciples' expressions of reverent commitment to mission, photorealistic image, high quality photograph with composition suggesting worldwide impact from this moment
+
+
