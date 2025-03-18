@@ -15,12 +15,15 @@ export async function GET(request) {
   }
   
   try {
-    // Use mock service in development
+    // Pass language to ensure verses are translated
     const result = await fetchBibleContent(
       book, 
       parseInt(chapter), 
       language
     );
+    
+    // Log that we're providing translated content (helpful for debugging)
+    console.log(`Providing ${language} content for ${book} ${chapter}`);
     
     return NextResponse.json(result);
   } catch (error) {

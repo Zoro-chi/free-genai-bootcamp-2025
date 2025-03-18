@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ImageGenerator from './ImageGenerator';
+import VerseExplainer from './VerseExplainer';
 import axios from 'axios';
 import BibleNavigation from './BibleNavigation';
-// Fixed icon imports
-import { HiViewGrid, HiMenuAlt2 } from 'react-icons/hi';
+import { HiViewGrid, HiMenuAlt2, HiInformationCircle } from 'react-icons/hi';
 
 const BibleChapterViewer = ({ 
   book = 'Matthew',
@@ -17,16 +17,24 @@ const BibleChapterViewer = ({
   const [loading, setLoading] = useState(true);
   const [currentVerse, setCurrentVerse] = useState(1);
   const [viewMode, setViewMode] = useState('split'); // 'split' or 'stacked'
+  const [selectedVerses, setSelectedVerses] = useState([]);
+  const [showExplainer, setShowExplainer] = useState(false);
   const router = useRouter();
   
   useEffect(() => {
     const loadBibleContent = async () => {
       setLoading(true);
       try {
+        // Always include language parameter to get properly translated content
         const response = await axios.get(`/api/bible-content?book=${book}&chapter=${chapter}&language=${language}`);
         setContent(response.data);
-        // Set verse to 1 when changing chapters
+        // Set verse to 1 when changing chapters or language
         setCurrentVerse(1);
+        
+        // Clear selected verses when language changes
+        if (selectedVerses.length > 0) {
+          setSelectedVerses([]);
+        }
       } catch (error) {
         console.error("Failed to fetch Bible content", error);
       } finally {
@@ -44,7 +52,7 @@ const BibleChapterViewer = ({
     if (viewMode) {
       localStorage.setItem('bibleViewMode', viewMode);
     }
-  }, [book, chapter, language, viewMode]); // Added viewMode dependency
+  }, [book, chapter, language, viewMode]); // Include language in dependencies
 
   // Initialize view mode from localStorage
   useEffect(() => {
@@ -101,6 +109,28 @@ const BibleChapterViewer = ({
     textAlign: 'center'
   };
 
+  // Toggle verse selection
+  const toggleVerseSelection = (verseNumber) => {
+    if (selectedVerses.includes(verseNumber)) {
+      setSelectedVerses(selectedVerses.filter(v => v !== verseNumber));
+    } else {
+      setSelectedVerses([...selectedVerses, verseNumber]);
+    }
+  };
+
+  // Request explanation for selected verses
+  const requestExplanation = () => {
+    if (selectedVerses.length > 0) {
+      setShowExplainer(true);
+    }
+  };
+
+  // Close the explainer
+  const closeExplainer = () => {
+    setShowExplainer(false);
+    setSelectedVerses([]);
+  };
+
   return (
     <div className="bible-chapter-viewer max-w-6xl mx-auto">
       {loading ? (
@@ -146,6 +176,30 @@ const BibleChapterViewer = ({
                   router.push(`/read?book=${book}&chapter=${chapter}&lang=${newLanguage}`)} 
               />
             </div>
+
+            {/* Add Verse Selection Tools */}
+            {selectedVerses.length > 0 && (
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-bible-royal">
+                  <span className="font-biblical">{selectedVerses.length} verse(s) selected</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setSelectedVerses([])}
+                    className="biblical-btn bg-gray-500 text-white px-3 py-1 text-sm"
+                  >
+                    Clear
+                  </button>
+                  <button
+                    onClick={requestExplanation}
+                    className="biblical-btn bg-bible-royal text-white px-3 py-1 text-sm flex items-center gap-1"
+                  >
+                    <HiInformationCircle className="w-4 h-4" />
+                    Explain
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Remove the separate language selector since it's now in the navigation component */}
@@ -163,12 +217,23 @@ const BibleChapterViewer = ({
                       key={verse.number}
                       className={`verse transition-colors duration-200 ${
                         currentVerse === verse.number ? 'bg-bible-scroll bg-opacity-20 rounded-md p-3' : ''
-                      }`}
+                      } ${selectedVerses.includes(verse.number) ? 'bg-bible-royal bg-opacity-10 border-l-4 border-bible-royal' : ''}`}
                       onClick={() => setCurrentVerse(verse.number)}
                       style={{ textAlign: 'center' }}
                     >
-                      <span className="verse-number">{verse.number}</span>
-                      <span className="verse-text">{verse.text}</span>
+                      <div className="flex items-start">
+                        <input 
+                          type="checkbox"
+                          className="mt-2 mr-2"
+                          checked={selectedVerses.includes(verse.number)}
+                          onChange={() => toggleVerseSelection(verse.number)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div>
+                          <span className="verse-number">{verse.number}</span>
+                          <span className="verse-text">{verse.text}</span>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -209,6 +274,17 @@ const BibleChapterViewer = ({
               )}
             </div>
           </div>
+          
+          {/* Verse Explainer Modal */}
+          {showExplainer && content && (
+            <VerseExplainer
+              verses={selectedVerses.map(num => content.verses.find(v => v.number === num))}
+              book={book}
+              chapter={chapter}
+              language={language}
+              onClose={closeExplainer}
+            />
+          )}
         </>
       )}
     </div>

@@ -15,6 +15,7 @@ const BibleNavigation = ({
 }) => {
   const [books, setBooks] = useState([]);
   const [testament, setTestament] = useState("New Testament");
+  const [changingLanguage, setChangingLanguage] = useState(false);
 
   useEffect(() => {
     const loadBooks = () => {
@@ -53,6 +54,17 @@ const BibleNavigation = ({
     } else {
       // Otherwise navigate directly
       window.location.href = `/read?book=${book}&chapter=${chapter}`;
+    }
+  };
+
+  // Enhanced language change handler
+  const handleLanguageChange = (newLanguage) => {
+    if (newLanguage !== language) {
+      setChangingLanguage(true);
+      // Call the parent's language change handler
+      onLanguageChange(newLanguage);
+      // Reset the changing state after a short delay
+      setTimeout(() => setChangingLanguage(false), 500);
     }
   };
 
@@ -204,12 +216,14 @@ const BibleNavigation = ({
             <select
               id="language-select"
               value={language}
-              onChange={(e) => onLanguageChange(e.target.value)}
-              className="biblical-select w-full font-biblical"
+              onChange={(e) => handleLanguageChange(e.target.value)}
+              className={`biblical-select w-full font-biblical ${changingLanguage ? 'opacity-50' : ''}`}
+              disabled={changingLanguage}
               style={{ textAlign: 'center', textAlignLast: 'center' }}
             >
               <option value="english">English</option>
               <option value="yoruba">Yoruba</option>
+              <option value="igbo">Igbo</option>
               <option value="pidgin">Nigerian Pidgin</option>
             </select>
           </div>

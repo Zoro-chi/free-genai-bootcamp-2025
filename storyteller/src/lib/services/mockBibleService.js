@@ -6,6 +6,7 @@
 // Import both data sources
 import bibleCustomData from '@/data/bibleContent.json';
 import kjvData from '@/data/KJV.json';
+import { translateVerses } from './translationService';
 
 // Extract the books array from the KJV data structure
 const kjvBible = kjvData.books || [];
@@ -41,13 +42,10 @@ export const fetchBibleContent = async (book, chapter, language = 'english') => 
     // Step 4: For English, or chapters without custom data, merge KJV with scene data (if available)
     const keyScenes = hasCustomData ? bibleCustomData[customKey].keyScenes : generateDefaultScenes(book, chapter, verses);
     
-    // Step 5: For non-English without custom translation, generate mock translation
+    // Step 5: For non-English without custom translation, use translation service
     const translatedVerses = language === 'english' 
       ? verses 
-      : verses.map(verse => ({
-          ...verse,
-          text: generateMockTranslation(verse.text, language)
-        }));
+      : await translateVerses(verses, language);
     
     return {
       book,
