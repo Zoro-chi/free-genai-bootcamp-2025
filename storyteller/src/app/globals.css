@@ -8,14 +8,56 @@
   --font-montserrat: var(--font-montserrat);
   --font-dancing-script: var(--font-dancing-script);
   
-  /* Biblical theme colors */
-  --parchment: #f5f1e6;
-  --scroll-brown: #d2b48c;
-  --ink-dark: #3a3224;
-  --gold-accent: #d4af37;
-  --royal-blue: #1e3a8a;
+  /* Biblical theme colors - will be overridden by ThemeContext */
+  --background: #f5f1e6;
+  --paper: #ffffff;
+  --text: #3a3224;
+  --primary: #1e3a8a;
+  --secondary: #d4af37;
+  --accent: #d2b48c;
+  
+  /* Biblical theme colors - legacy variables */
+  --parchment: var(--background);
+  --scroll-brown: var(--accent);
+  --ink-dark: var(--text);
+  --gold-accent: var(--secondary);
+  --royal-blue: var(--primary);
   --deep-red: #8b0000;
   --olive-green: #556b2f;
+}
+
+/* Dark mode theme class */
+.theme-dark {
+  --background: #121212;
+  --paper: #1e1e1e;
+  --text: #e0e0e0;
+  --primary: #90caf9;
+  --secondary: #f1c40f;
+  --accent: #a67c52;
+  
+  /* Update legacy variables */
+  --parchment: var(--background);
+  --scroll-brown: var(--accent);
+  --ink-dark: var(--text);
+  --gold-accent: var(--secondary);
+  --royal-blue: var(--primary);
+}
+
+/* Sepia theme class */
+.theme-sepia {
+  --background: #f4ecd8;
+  --paper: #fbf7ef;
+  --text: #5b4636;
+  --primary: #8b4513;
+  --secondary: #cd7f32;
+  --accent: #b38b6d;
+  
+  /* Update legacy variables */
+  --parchment: var(--background);
+  --scroll-brown: var(--accent);
+  --ink-dark: var(--text);
+  --gold-accent: var(--secondary);
+  --royal-blue: var(--primary);
 }
 
 body {
@@ -23,15 +65,21 @@ body {
   font-family: var(--font-lora), Georgia, serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--ink-dark);
-  background-color: var(--parchment);
+  color: var(--text);
+  background-color: var(--background);
   background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d2b48c' fill-opacity='0.2'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode background pattern */
+.theme-dark body {
+  background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a67c52' fill-opacity='0.1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-montserrat), serif;
   font-weight: 600;
-  color: var(--royal-blue);
+  color: var(--primary);
 }
 
 .verse {
@@ -98,6 +146,12 @@ h1, h2, h3, h4, h5, h6 {
   height: 100%; /* Make sure it fills container height */
   display: flex;
   flex-direction: column;
+}
+
+/* Dark mode adjustments */
+.theme-dark .bible-paper {
+  background-color: var(--paper);
+  border-color: rgba(166, 124, 82, 0.5);
 }
 
 /* Story card styling */
@@ -181,5 +235,117 @@ h1, h2, h3, h4, h5, h6 {
 
 .font-dancing-script {
   font-family: var(--font-dancing-script), cursive;
+}
+
+/* Add at the end of your existing CSS */
+
+/* Mobile-specific styles */
+@media (max-width: 767px) {
+  /* Enhance touch targets for better mobile usability */
+  button, select, input[type="checkbox"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Make inputs and selects easier to tap */
+  input, select {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Improve verse selection on mobile */
+  .verse {
+    padding: 12px 8px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+  
+  /* Better spacing for mobile */
+  .bible-paper {
+    padding: 12px;
+  }
+  
+  /* Smaller text for mobile */
+  .text-2xs {
+    font-size: 0.625rem;
+    line-height: 0.75rem;
+  }
+  
+  /* Add momentum scrolling for iOS */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent pull-to-refresh on mobile */
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Prevent text selection on mobile taps */
+  .no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* Responsive font sizes */
+.verse-text {
+  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+}
+
+/* Improve image scaling */
+.image-container img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Dark mode adjustments */
+.theme-dark .verse:hover {
+  background-color: rgba(166, 124, 82, 0.15);
+}
+
+.theme-dark .chapter-header {
+  background-color: var(--paper);
+}
+
+.theme-dark .placeholder-image {
+  background-color: var(--paper);
+}
+
+/* Update styles for theme toggle */
+.theme-toggle-btn {
+  position: fixed;
+  bottom: 4rem;
+  right: 1rem;
+  z-index: 40;
+  background-color: var(--paper);
+  color: var(--primary);
+  border: 1px solid var(--accent);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.theme-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Bookmark styles */
+.bookmark-animation {
+  animation: bookmark-pulse 0.6s ease-in-out;
+}
+
+@keyframes bookmark-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
+  100% { transform: scale(1); }
 }
 

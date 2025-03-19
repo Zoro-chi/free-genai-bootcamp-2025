@@ -1,271 +1,135 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { getAllBooks } from "@/lib/services/mockBibleService";
-import { HiChevronLeft, HiChevronRight, HiOutlineBookOpen } from "react-icons/hi";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { config } from '@/lib/config';
 
 const BibleNavigation = ({ 
-  currentBook, 
-  currentChapter, 
-  language, 
-  onLanguageChange,
-  // Add new props for flexibility
-  onBookChapterChange = null,
-  hideNavButtons = false
+  currentBook = 'Matthew',
+  currentChapter = 1, 
+  language = 'english',
+  isMobile = false,
+  onLanguageChange = () => {}
 }) => {
-  const [books, setBooks] = useState([]);
-  const [testament, setTestament] = useState("New Testament");
-  const [changingLanguage, setChangingLanguage] = useState(false);
-
+  const router = useRouter();
+  const [books, setBooks] = useState(null);
+  const [loadingBooks, setLoadingBooks] = useState(true);
+  
   useEffect(() => {
-    const loadBooks = () => {
+    // Fetch books in selected language
+    const fetchBooks = async () => {
       try {
-        const allBooks = getAllBooks();
-        setBooks(allBooks);
-
-        // Set testament based on current book
-        const currentBookObj = allBooks.find((b) => b.name === currentBook);
-        if (currentBookObj) {
-          setTestament(currentBookObj.testament);
-        }
+        setLoadingBooks(true);
+        // This would be a real API call in production
+        // For now we'll use a mock response
+        
+        // Simulating API call delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Mock data - in production this would be fetched from API
+        const mockBooks = {
+          'Genesis': { chapters: 50 },
+          'Exodus': { chapters: 40 },
+          'Leviticus': { chapters: 27 },
+          // ... other Old Testament books
+          'Matthew': { chapters: 28 },
+          'Mark': { chapters: 16 },
+          'Luke': { chapters: 24 },
+          'John': { chapters: 21 },
+          'Acts': { chapters: 28 },
+          // ... other New Testament books
+          'Revelation': { chapters: 22 }
+        };
+        
+        setBooks(mockBooks);
       } catch (error) {
-        console.error("Error loading books:", error);
-        setBooks([]);
+        console.error("Failed to fetch Bible books:", error);
+      } finally {
+        setLoadingBooks(false);
       }
     };
-
-    loadBooks();
-  }, [currentBook]);
-
-  // Get list of books for current testament
-  const filteredBooks = books.filter((book) => book.testament === testament);
-
-  // Get current book info
-  const bookInfo = books.find((b) => b.name === currentBook) || { chapters: 0 };
-
-  // Create array of chapter numbers for the current book
-  const chapters = Array.from({ length: bookInfo.chapters }, (_, i) => i + 1);
-
-  // Enhanced navigation function for both direct navigation and parent state updates
-  const handleBookChapterChange = (book, chapter) => {
-    // If parent provided a change handler, call it
-    if (onBookChapterChange) {
-      onBookChapterChange(book, chapter);
-    } else {
-      // Otherwise navigate directly
-      window.location.href = `/read?book=${book}&chapter=${chapter}`;
+    
+    fetchBooks();
+  }, [language]);
+  
+  // Generate array of available chapters for the current book
+  const availableChapters = [];
+  if (books && books[currentBook]) {
+    for (let i = 1; i <= books[currentBook].chapters; i++) {
+      availableChapters.push(i);
     }
-  };
-
-  // Enhanced language change handler
-  const handleLanguageChange = (newLanguage) => {
-    if (newLanguage !== language) {
-      setChangingLanguage(true);
-      // Call the parent's language change handler
-      onLanguageChange(newLanguage);
-      // Reset the changing state after a short delay
-      setTimeout(() => setChangingLanguage(false), 500);
-    }
-  };
-
-  // Determine if previous/next buttons should be disabled
-  const isPrevDisabled = currentChapter <= 1;
-  const isNextDisabled = currentChapter >= bookInfo.chapters;
-
-  // Apply inline styles for guaranteed flex layout and text centering
-  const containerStyle = {
-    width: '100%',
-    maxWidth: '100%',
-    textAlign: 'center'
+  }
+  
+  const handleBookChange = (e) => {
+    const newBook = e.target.value;
+    router.push(`/read?book=${newBook}&chapter=1&lang=${language}`);
   };
   
-  const testamentRowStyle = {
-    display: 'flex', 
-    justifyContent: 'center',
-    marginBottom: '2rem',
-    textAlign: 'center'
+  const handleChapterChange = (e) => {
+    const newChapter = e.target.value;
+    router.push(`/read?book=${currentBook}&chapter=${newChapter}&lang=${language}`);
   };
   
-  const selectorsRowStyle = {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: '1rem',
-    marginBottom: '2rem',
-    width: '100%',
-    textAlign: 'center'
+  const handleLanguageChange = (e) => {
+    const newLanguage = e.target.value.toLowerCase();
+    onLanguageChange(newLanguage);
   };
   
-  const selectorColumnStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    minWidth: 0, // Prevent overflow on small screens
-    gap: '0.5rem',
-    textAlign: 'center'
-  };
-
-  const navigationRowStyle = {
-    display: 'flex',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginTop: '2rem',
-    paddingTop: '1.5rem',
-    borderTop: '1px solid var(--scroll-brown)',
-    marginBottom: '4rem',
-    textAlign: 'center'
-  };
-
-  const labelStyle = {
-    textAlign: 'center',
-    display: 'block',
-    fontWeight: 'bold',
-    marginBottom: '0.5rem'
-  };
-
   return (
-    <div className="bible-navigation" style={containerStyle}>
-      <div className="bg-bible-parchment rounded-lg p-6 border border-bible-scroll" style={{ textAlign: 'center' }}>
-        {/* Row 1: Testament selector - centered with increased margin between buttons */}
-        <div style={testamentRowStyle}>
-          <div className="inline-flex gap-8" style={{ textAlign: 'center' }}>
-            <button
-              className={`px-8 py-3 text-base rounded-lg border-2 font-biblical transition-colors min-w-[160px] ${
-                testament === "Old Testament"
-                  ? "bg-bible-royal text-white border-bible-royal"
-                  : "bg-white text-bible-ink border-bible-scroll hover:bg-bible-scroll hover:bg-opacity-10"
-              }`}
-              onClick={() => setTestament("Old Testament")}
-              style={{ textAlign: 'center' }}
+    <div className={`bible-navigation ${isMobile ? 'flex flex-col gap-2' : 'flex flex-wrap items-center gap-4'}`}>
+      {loadingBooks ? (
+        <div className="loading text-sm text-bible-royal">Loading books...</div>
+      ) : (
+        <>
+          {/* Book selection */}
+          <div className={`book-select ${isMobile ? 'w-full' : 'flex-grow'}`}>
+            <select 
+              value={currentBook} 
+              onChange={handleBookChange}
+              className={`w-full p-2 rounded-md border border-bible-scroll focus:outline-none focus:ring-1 focus:ring-bible-royal
+                ${isMobile ? 'text-sm' : 'text-base'}`}
+              aria-label="Select book"
             >
-              Old Testament
-            </button>
-            <button
-              className={`px-8 py-3 text-base rounded-lg border-2 font-biblical transition-colors min-w-[160px] ${
-                testament === "New Testament"
-                  ? "bg-bible-royal text-white border-bible-royal"
-                  : "bg-white text-bible-ink border-bible-scroll hover:bg-bible-scroll hover:bg-opacity-10"
-              }`}
-              onClick={() => setTestament("New Testament")}
-              style={{ textAlign: 'center' }}
-            >
-              New Testament
-            </button>
-          </div>
-        </div>
-
-        {/* Row 2: Book, Chapter and Language selectors in a single row with forced flex-row */}
-        <div style={selectorsRowStyle}>
-          {/* Book selector */}
-          <div style={selectorColumnStyle}>
-            <label
-              htmlFor="book-select"
-              className="block text-bible-royal font-bold mb-2 font-biblical"
-              style={labelStyle}
-            >
-              Book
-            </label>
-            <select
-              id="book-select"
-              className="biblical-select w-full font-biblical text-center"
-              value={currentBook}
-              onChange={(e) => handleBookChapterChange(e.target.value, 1)}
-              style={{ textAlign: 'center', textAlignLast: 'center' }}
-            >
-              {filteredBooks.map((book) => (
-                <option key={book.name} value={book.name}>
-                  {book.name}
-                </option>
+              {books && Object.keys(books).map(book => (
+                <option key={book} value={book}>{book}</option>
               ))}
             </select>
           </div>
-
-          {/* Chapter selector */}
-          <div style={selectorColumnStyle}>
-            <label
-              htmlFor="chapter-select"
-              className="block text-bible-royal font-bold mb-2 font-biblical text-center"
-              style={labelStyle}
+          
+          {/* Chapter selection */}
+          <div className={`chapter-select ${isMobile ? 'w-full' : 'w-24'}`}>
+            <select 
+              value={currentChapter} 
+              onChange={handleChapterChange}
+              className={`w-full p-2 rounded-md border border-bible-scroll focus:outline-none focus:ring-1 focus:ring-bible-royal
+                ${isMobile ? 'text-sm' : 'text-base'}`}
+              aria-label="Select chapter"
             >
-              Chapter
-            </label>
-            <select
-              id="chapter-select"
-              className="biblical-select w-full font-biblical"
-              value={currentChapter}
-              onChange={(e) => handleBookChapterChange(currentBook, e.target.value)}
-              style={{ textAlign: 'center', textAlignLast: 'center' }}
-            >
-              {chapters.map((num) => (
-                <option key={num} value={num}>
-                  Chapter {num}
+              {availableChapters.map(chapter => (
+                <option key={chapter} value={chapter}>
+                  Chapter {chapter}
                 </option>
               ))}
             </select>
           </div>
           
           {/* Language selector */}
-          <div style={selectorColumnStyle}>
-            <label 
-              htmlFor="language-select"
-              className="block text-bible-royal font-bold mb-2 font-biblical text-center"
-              style={labelStyle}
+          <div className={`language-select ${isMobile ? 'w-full mt-1' : 'w-32'}`}>
+            <select 
+              value={language} 
+              onChange={handleLanguageChange}
+              className={`w-full p-2 rounded-md border border-bible-scroll bg-bible-parchment focus:outline-none focus:ring-1 focus:ring-bible-royal
+                ${isMobile ? 'text-sm' : 'text-base'}`}
+              aria-label="Select language"
             >
-              Language
-            </label>
-            <select
-              id="language-select"
-              value={language}
-              onChange={(e) => handleLanguageChange(e.target.value)}
-              className={`biblical-select w-full font-biblical ${changingLanguage ? 'opacity-50' : ''}`}
-              disabled={changingLanguage}
-              style={{ textAlign: 'center', textAlignLast: 'center' }}
-            >
-              <option value="english">English</option>
-              <option value="yoruba">Yoruba</option>
-              <option value="igbo">Igbo</option>
-              <option value="pidgin">Nigerian Pidgin</option>
+              {config.languages.available.map(lang => (
+                <option key={lang} value={lang}>
+                  {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
-        </div>
-      </div>
-
-      {/* Row 3: Previous/Next navigation buttons - conditionally rendered */}
-      {!hideNavButtons && (
-        <div style={navigationRowStyle}>
-          <button
-            onClick={() => !isPrevDisabled && handleBookChapterChange(currentBook, currentChapter - 1)}
-            className={`biblical-btn flex items-center gap-2 ${
-              isPrevDisabled
-                ? "opacity-50 cursor-not-allowed bg-gray-200"
-                : "hover:bg-bible-gold"
-            }`}
-            disabled={isPrevDisabled}
-            aria-label="Previous Chapter"
-          >
-            <HiChevronLeft className="w-5 h-5" />
-            <span className="font-biblical">Previous Chapter</span>
-          </button>
-
-          <div className="flex items-center text-bible-royal bg-bible-parchment px-6 py-2 rounded-full border border-bible-scroll">
-            <HiOutlineBookOpen className="w-6 h-6 mr-2 text-bible-gold" />
-            <span className="font-biblical text-lg">{currentBook} {currentChapter}</span>
-          </div>
-
-          <button
-            onClick={() => !isNextDisabled && handleBookChapterChange(currentBook, currentChapter + 1)}
-            className={`biblical-btn flex items-center gap-2 ${
-              isNextDisabled
-                ? "opacity-50 cursor-not-allowed bg-gray-200"
-                : "hover:bg-bible-gold"
-            }`}
-            disabled={isNextDisabled}
-            aria-label="Next Chapter"
-          >
-            <span className="font-biblical">Next Chapter</span>
-            <HiChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+        </>
       )}
     </div>
   );
