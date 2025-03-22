@@ -11,6 +11,78 @@ import { translateVerses } from './translationService';
 // Extract the books array from the KJV data structure
 const kjvBible = kjvData.books || [];
 
+// Cache keys for localStorage
+const VERSE_CACHE_KEY = 'storyteller-bible-content-cache';
+
+// Create a translation cache to avoid repeated API calls
+let contentCache = {};
+
+// Load cache from localStorage on client-side
+if (typeof window !== 'undefined') {
+  try {
+    const savedCache = localStorage.getItem(VERSE_CACHE_KEY);
+    if (savedCache) {
+      contentCache = JSON.parse(savedCache);
+      console.log(`%c📚 Loaded Bible content cache from localStorage with ${Object.keys(contentCache).length} entries`, 
+                  'background: #e6f7ff; color: #0066cc; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
+    } else {
+      console.log('%c💫 No Bible content cache in localStorage', 'color: #ff9900; font-weight: bold;');
+    }
+  } catch (error) {
+    console.error('Failed to load Bible content cache:', error);
+    contentCache = {};
+  }
+  
+  // Add to window for debugging
+  window.bibleCacheDebug = {
+    showCache: () => {
+      console.log('Bible content cache:', contentCache);
+      return {
+        cacheSize: Object.keys(contentCache).length,
+        cacheKeys: Object.keys(contentCache)
+      };
+    },
+    clearCache: () => {
+      contentCache = {};
+      localStorage.removeItem(VERSE_CACHE_KEY);
+      console.log('Bible content cache cleared');
+      return "Cache cleared";
+    }
+  };
+}
+
+/**
+ * Save the cache to localStorage
+ */
+function saveContentCache() {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    localStorage.setItem(VERSE_CACHE_KEY, JSON.stringify(contentCache));
+    console.log(`%c💾 Saved Bible content cache to localStorage (${Object.keys(contentCache).length} entries)`, 
+                'background: #e6ffe6; color: #006600; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
+  } catch (error) {
+    console.error('Failed to save Bible content cache:', error);
+    
+    // If storage quota exceeded, prune the cache
+    if (error.name === 'QuotaExceededError') {
+      // Remove older entries
+      const keys = Object.keys(contentCache);
+      if (keys.length > 50) {
+        const keysToRemove = keys.slice(0, keys.length - 50);
+        keysToRemove.forEach(key => delete contentCache[key]);
+        
+        try {
+          localStorage.setItem(VERSE_CACHE_KEY, JSON.stringify(contentCache));
+          console.log('Successfully saved cache after pruning');
+        } catch (retryError) {
+          console.error('Still failed to save cache after pruning:', retryError);
+        }
+      }
+    }
+  }
+}
+
 /**
  * Fetch Bible content for a specific book, chapter, and language
  * @param {string} book - Bible book name (e.g., "John", "Matthew")
@@ -19,8 +91,21 @@ const kjvBible = kjvData.books || [];
  * @returns {Promise<Object>} - Bible content with verses and key scenes
  */
 export const fetchBibleContent = async (book, chapter, language = 'english') => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 300));
+  // Skip caching for English content since we have it locally
+  const shouldCache = language !== 'english';
+  
+  // Create a cache key based on book, chapter, and language
+  const cacheKey = `${book}-${chapter}-${language}`;
+  
+  // Check cache only for non-English content
+  if (shouldCache && contentCache[cacheKey]) {
+    console.log(`%c🔄 CACHED: Serving ${book} ${chapter} in ${language} from cache`, 
+                'background: #fff3cd; color: #856404; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
+    return contentCache[cacheKey];
+  }
+  
+  console.log(`%c🌐 FETCHING: Bible content for ${book} ${chapter} in ${language}`, 
+              'background: #cce5ff; color: #004085; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
   
   try {
     // Step 1: Get basic verse content from KJV.json
@@ -36,7 +121,15 @@ export const fetchBibleContent = async (book, chapter, language = 'english') => 
     
     // Step 3: If we have custom data and non-English language, use that
     if (language !== 'english' && hasCustomData) {
-      return bibleCustomData[customKey];
+      const content = bibleCustomData[customKey];
+      // Only store in cache if it's not English
+      if (shouldCache) {
+        contentCache[cacheKey] = content;
+        console.log(`%c📥 CACHED: Added ${book} ${chapter} in ${language} to cache`, 
+                    'background: #d4edda; color: #155724; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
+        saveContentCache();
+      }
+      return content;
     }
     
     // Step 4: For English, or chapters without custom data, merge KJV with scene data (if available)
@@ -45,14 +138,27 @@ export const fetchBibleContent = async (book, chapter, language = 'english') => 
     // Step 5: For non-English without custom translation, use translation service
     const translatedVerses = language === 'english' 
       ? verses 
-      : await translateVerses(verses, language);
+      : await translateVerses(verses, language, 'english', (current, total) => {
+          // We could potentially pass a progress callback here if needed
+          console.log(`Translation progress: ${current}/${total}`);
+        });
     
-    return {
+    const content = {
       book,
       chapter: Number(chapter),
       verses: translatedVerses,
       keyScenes
     };
+    
+    // Only store in cache if it's not English
+    if (shouldCache) {
+      contentCache[cacheKey] = content;
+      console.log(`%c📥 CACHED: Added ${book} ${chapter} in ${language} to cache`, 
+                  'background: #d4edda; color: #155724; font-weight: bold; padding: 2px 5px; border-radius: 3px;');
+      saveContentCache();
+    }
+    
+    return content;
   } catch (error) {
     console.error(`Error fetching Bible content for ${book} ${chapter}:`, error);
     return generatePlaceholderContent(book, chapter, language);
@@ -97,7 +203,17 @@ function getVersesFromKJV(book, chapterNum) {
 function normalizeBookName(name) {
   if (!name) return '';
   
-  return name.toLowerCase()
+  // Special handling for numbered books
+  // First convert spelled-out numbers to digits (First -> 1, Second -> 2)
+  let normalizedName = name
+    .replace(/^First\s+/i, '1 ')
+    .replace(/^Second\s+/i, '2 ')
+    .replace(/^Third\s+/i, '3 ')
+    .replace(/^I\s+/i, '1 ')
+    .replace(/^II\s+/i, '2 ')
+    .replace(/^III\s+/i, '3 ');
+  
+  return normalizedName.toLowerCase()
     .replace(/\s+/g, '')
     .replace(/[^a-z0-9]/g, '');
 }
@@ -224,33 +340,124 @@ export const getBookInfo = (bookName) => {
  * Determine Old or New Testament
  */
 function getTestament(bookName) {
+  // Handle potential variations in book names
+  const standardizedName = standardizeBookName(bookName);
+  
   const newTestamentBooks = [
     'Matthew', 'Mark', 'Luke', 'John', 'Acts', 'Romans', 
     '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians', 
     'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', 
     '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James', 
-    '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation'
+    '1 Peter', '2 Peter', '1 John', '2 John', '3 John', 'Jude', 'Revelation', 'Revelation of John'
   ];
   
-  return newTestamentBooks.includes(bookName) ? 'New Testament' : 'Old Testament';
+  // Check for "Revelation of John" explicitly
+  if (standardizedName === "Revelation of John" || standardizedName.includes("Revelation")) {
+    return "new";
+  }
+  
+  // More flexible matching for numbered books
+  for (const book of newTestamentBooks) {
+    if (standardizedName.includes(book.toLowerCase().replace(/\s+/g, ''))) {
+      return "new";
+    }
+  }
+  
+  return newTestamentBooks.includes(standardizedName) ? "new" : "old";
 }
 
 /**
- * Get all books in the Bible
+ * Standardize book names to canonical form
+ */
+function standardizeBookName(name) {
+  // Handle both forms: "1 Corinthians" and "First Corinthians"
+  const standardizedName = name
+    .replace(/^First\s+/i, '1 ')
+    .replace(/^Second\s+/i, '2 ')
+    .replace(/^Third\s+/i, '3 ')
+    .replace(/^I\s+/i, '1 ')
+    .replace(/^II\s+/i, '2 ')
+    .replace(/^III\s+/i, '3 ');
+  
+  return standardizedName;
+}
+
+/**
+ * Get all books in the Bible with standardized names
  * @returns {Array} - List of all Bible books with their information
  */
 export const getAllBooks = () => {
-  return kjvBible.map(book => ({
-    id: book.name,
-    name: book.name,
-    abbrev: book.name.substring(0, 3),
-    chapters: book.chapters.length,
-    testament: getTestament(book.name)
-  }));
+  // Create a map to prevent duplicate book entries
+  const bookMap = new Map();
+  
+  kjvBible.forEach(book => {
+    // Standardize the book name
+    const standardizedName = standardizeBookName(book.name);
+    const testament = getTestament(standardizedName);
+    
+    // Create book data object
+    const bookData = {
+      id: book.name,
+      name: standardizedName, // Use standardized name
+      originalName: book.name, // Keep original for reference
+      abbrev: standardizedName.substring(0, 3),
+      chapters: book.chapters.length,
+      testament: testament
+    };
+    
+    // Only add the book if it's not already in the map
+    if (!bookMap.has(standardizedName)) {
+      bookMap.set(standardizedName, bookData);
+    }
+  });
+  
+  return Array.from(bookMap.values());
 };
+
+// Add a function to clear the translation cache (useful for testing)
+export const clearTranslationCache = () => {
+  Object.keys(translationCache).forEach(key => {
+    delete translationCache[key];
+  });
+  console.log("Translation cache cleared");
+};
+
+// Add this debugging function at the end of the file
+export const debugBibleService = () => {
+  const books = getAllBooks();
+  const bookNames = books.map(book => book.name);
+  console.log("All books available:", bookNames);
+  console.log("Total books:", bookNames.length);
+  console.log("Revelation included:", bookNames.includes("Revelation"));
+  
+  // Check if the book chapter data exists
+  const revelation = books.find(b => b.name === "Revelation");
+  console.log("Revelation data:", revelation);
+  
+  // Also check cache
+  const cacheInfo = typeof window !== 'undefined' ? {
+    cacheSize: Object.keys(contentCache).length,
+    cacheKeys: Object.keys(contentCache),
+    localStorageSize: localStorage.getItem(VERSE_CACHE_KEY) ? 
+      (localStorage.getItem(VERSE_CACHE_KEY).length / 1024).toFixed(2) + 'KB' : '0KB'
+  } : { serverSide: true };
+  
+  return {
+    allBooks: bookNames,
+    hasRevelation: bookNames.includes("Revelation"),
+    revelationData: revelation,
+    cache: cacheInfo
+  };
+};
+
+// Call this function when the app initializes to debug
+if (typeof window !== 'undefined') {
+  window.debugBibleService = debugBibleService;
+}
 
 export default {
   fetchBibleContent,
   getBookInfo,
-  getAllBooks
+  getAllBooks,
+  debugBibleService
 };

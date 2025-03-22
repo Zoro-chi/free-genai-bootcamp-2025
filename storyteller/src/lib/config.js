@@ -37,9 +37,13 @@ export const config = {
   
   // Translation settings
   translation: {
-    // Updated provider to Titan
+    // Updated provider to Claude for Nigerian languages
     provider: process.env.NEXT_PUBLIC_TRANSLATION_PROVIDER || 'mock',
-    bedrockModel: 'amazon.titan-text-express-v1',
+    // Updated to use Amazon Nova Lite as primary model
+    bedrockModel: 'amazon.nova-lite-v1:0', // Changed from Claude 3 Haiku to Nova Lite
+    bedrockFallbackModels: [
+      'amazon.titan-text-express-v1' // Titan as last resort
+    ],
     openaiModel: 'gpt-3.5-turbo'
   },
   

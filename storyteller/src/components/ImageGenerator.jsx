@@ -22,6 +22,53 @@ const ImageGenerator = ({
   const [imageSource, setImageSource] = useState('pregenerated'); // 'pregenerated' or 'generated'
   const [isZoomed, setIsZoomed] = useState(false);
   
+  // Cache key for localStorage
+  const IMAGE_CACHE_KEY = 'storyteller-image-cache';
+
+  // Initialize cache
+  let imageCache = {};
+
+  // Load cache on mount (client-side only)
+  useEffect(() => {
+    // Only load cache on client-side
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCache = localStorage.getItem(IMAGE_CACHE_KEY);
+        if (savedCache) {
+          imageCache = JSON.parse(savedCache);
+          console.log(`Loaded ${Object.keys(imageCache).length} image references from cache`);
+        }
+      } catch (error) {
+        console.error('Failed to load image cache:', error);
+      }
+    }
+  }, []);
+
+  // Save cache function
+  const saveImageCache = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache));
+      } catch (error) {
+        console.error('Failed to save image cache:', error);
+        
+        // If it's a quota error, prune the cache
+        if (error.name === 'QuotaExceededError') {
+          const keys = Object.keys(imageCache);
+          // Keep only the last 20 entries
+          if (keys.length > 20) {
+            const newCache = {};
+            keys.slice(-20).forEach(key => {
+              newCache[key] = imageCache[key];
+            });
+            imageCache = newCache;
+            localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache));
+          }
+        }
+      }
+    }
+  };
+
   // Define fixed height styles
   const imageContainerStyle = fixedHeight ? {
     height: '400px',    // Fixed height for the container
@@ -56,6 +103,16 @@ const ImageGenerator = ({
           }
         }
         
+        // Generate a cache key from props
+        const cacheKey = `${biblicalEvent}-${characters}-${setting}-${language}-${region}`;
+
+        // Check cache before making API call
+        if (imageCache[cacheKey]) {
+          setImage(imageCache[cacheKey]);
+          setLoading(false);
+          return;
+        }
+
         // If no pre-generated image is found, generate one on-the-fly
         setImageSource('generated');
         
@@ -68,7 +125,13 @@ const ImageGenerator = ({
           region
         });
         
-        setImage(response.data.imageUrl);
+        if (response.data && response.data.imageUrl) {
+          const imageUrl = response.data.imageUrl;
+          // Only cache successful API responses
+          imageCache[cacheKey] = imageUrl;
+          saveImageCache();
+          setImage(imageUrl);
+        }
       } catch (err) {
         console.error("Failed to load or generate image:", err);
         setError("Could not display the requested image");

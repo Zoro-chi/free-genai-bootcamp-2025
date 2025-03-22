@@ -8,7 +8,8 @@ import { getBookInfo } from '@/lib/services/mockBibleService';
 
 export default function ReadPage() {
   const searchParams = useSearchParams();
-  const book = searchParams.get('book') || 'Matthew';
+  // Make sure to decode the book name from the URL
+  const book = searchParams.get('book') ? decodeURIComponent(searchParams.get('book')) : 'Matthew';
   const chapter = parseInt(searchParams.get('chapter')) || 1;
   const lang = searchParams.get('lang') || 'english';
   
@@ -17,6 +18,9 @@ export default function ReadPage() {
   const [bookInfo, setBookInfo] = useState(null);
   
   useEffect(() => {
+    // Add debug log to verify the book name
+    console.log("Reading book:", book, "chapter:", chapter);
+    
     // Validate that the requested book and chapter exist
     const info = getBookInfo(book);
     setBookInfo(info);

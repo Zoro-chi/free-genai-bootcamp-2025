@@ -6,11 +6,13 @@ import ImageGenerator from './ImageGenerator';
 import VerseExplainer from './VerseExplainer';
 import axios from 'axios';
 import BibleNavigation from './BibleNavigation';
-import { HiViewGrid, HiMenuAlt2, HiInformationCircle, HiChevronUp, HiChevronDown } from 'react-icons/hi';
+import { HiViewGrid, HiMenuAlt2, HiInformationCircle, HiChevronUp, HiChevronDown, HiSpeakerphone, HiX } from 'react-icons/hi';
 import ThemeToggle from './ThemeToggle';  // Import ThemeToggle
 import BookmarkManager from './BookmarkManager';  // Import BookmarkManager
 import { useTheme } from '@/contexts/ThemeContext';  // Import useTheme hook
 import { config } from '@/lib/config';
+import TextToSpeech from './TextToSpeech'; // Add the import for TextToSpeech
+import LoadingIndicator from './LoadingIndicator';
 
 const BibleChapterViewer = ({ 
   book = 'Matthew',
@@ -111,22 +113,124 @@ const BibleChapterViewer = ({
     }
   };
 
+  const [translationProgress, setTranslationProgress] = useState({ current: 0, total: 0 });
+  const [isTranslating, setIsTranslating] = useState(false);
+
   useEffect(() => {
     const loadBibleContent = async () => {
       setLoading(true);
       try {
-        // Always include language parameter to get properly translated content
-        const response = await axios.get(`/api/bible-content?book=${book}&chapter=${chapter}&language=${language}`);
-        setContent(response.data);
-        // Set verse to 1 when changing chapters or language
-        setCurrentVerse(1);
+        // First try to load through the API
+        try {
+          // Update to track translation progress
+          const handleTranslationProgress = (current, total) => {
+            setTranslationProgress({ current, total });
+          };
+          
+          setIsTranslating(true);
+          const response = await axios.get(`/api/bible-content?book=${book}&chapter=${chapter}&language=${language}`);
+          
+          console.log("API response:", response.data);
+          if (response.data && response.data.verses) {
+            setContent(response.data);
+            setCurrentVerse(1);
+            if (selectedVerses.length > 0) {
+              setSelectedVerses([]);
+            }
+            setIsTranslating(false);
+            return; // Exit early if API call succeeded
+          }
+        } catch (apiError) {
+          console.warn("API fetch failed, falling back to static data:", apiError);
+          setIsTranslating(false);
+        }
         
-        // Clear selected verses when language changes
-        if (selectedVerses.length > 0) {
-          setSelectedVerses([]);
+        // If API fails, fall back to static data loading
+        console.log("Loading from static data for:", book, chapter, language);
+        
+        // Dynamically choose the right data file based on language
+        try {
+          // Import KJV English Bible data (all languages fall back to English for now)
+          const { default: kjvData } = await import('@/data/KJV.json');
+          
+          // Find the correct book in the Bible data
+          const bookData = kjvData.books.find(b => 
+            b.name.toLowerCase() === book.toLowerCase()
+          );
+          
+          if (!bookData) {
+            console.error(`Book "${book}" not found in KJV data`);
+            setLoading(false);
+            return;
+          }
+          
+          console.log(`Found book data for ${book} with ${bookData.chapters.length} chapters`);
+          
+          // Find the correct chapter in the book
+          if (bookData.chapters.length < chapter) {
+            console.error(`Chapter ${chapter} not found in ${book}, max is ${bookData.chapters.length}`);
+            setLoading(false);
+            return;
+          }
+          
+          const chapterData = bookData.chapters[parseInt(chapter) - 1];
+          if (!chapterData) {
+            console.error(`Chapter ${chapter} data could not be retrieved for ${book}`);
+            setLoading(false);
+            return;
+          }
+          
+          // Format data to match the expected structure
+          const formattedVerses = chapterData.verses.map(v => ({
+            number: v.verse,
+            text: v.text
+          }));
+          
+          const keyScenes = extractKeyScenes(bookData.name, parseInt(chapter), chapterData.verses);
+          
+          // For English, we can just set the content directly
+          if (language === 'english') {
+            setContent({
+              book,
+              chapter: parseInt(chapter),
+              verses: formattedVerses,
+              keyScenes
+            });
+          } else {
+            // For non-English, we need to translate
+            setIsTranslating(true);
+            
+            // Get translation service and translate verses with progress callback
+            const { translateVerses } = await import('@/lib/services/translationService');
+            const translatedVerses = await translateVerses(
+              formattedVerses, 
+              language, 
+              'english', 
+              (current, total) => setTranslationProgress({ current, total })
+            );
+            
+            setContent({
+              book,
+              chapter: parseInt(chapter),
+              verses: translatedVerses,
+              keyScenes
+            });
+            
+            setIsTranslating(false);
+          }
+          
+          // Set verse to 1 when changing chapters or language
+          setCurrentVerse(1);
+          
+          // Clear selected verses when language changes
+          if (selectedVerses.length > 0) {
+            setSelectedVerses([]);
+          }
+        } catch (staticError) {
+          console.error("Failed to load from static data:", staticError);
         }
       } catch (error) {
-        console.error("Failed to fetch Bible content", error);
+        console.error("All Bible content loading methods failed:", error);
       } finally {
         setLoading(false);
       }
@@ -144,14 +248,69 @@ const BibleChapterViewer = ({
     }
   }, [book, chapter, language, viewMode]); // Include language in dependencies
 
-  // Initialize view mode from localStorage
-  useEffect(() => {
-    const savedViewMode = localStorage.getItem('bibleViewMode');
-    if (savedViewMode) {
-      setViewMode(savedViewMode);
+  // Helper function to extract key scenes from the chapter
+  const extractKeyScenes = (bookName, chapterNum, verses) => {
+    // This is a simple algorithm to identify potential key scenes
+    // In a real app, you might have predefined key scenes or use NLP to identify them
+    
+    const scenes = [];
+    const verseCount = verses.length;
+    
+    if (verseCount <= 10) {
+      // For short chapters, consider the whole chapter as one scene
+      scenes.push({
+        event: `${bookName} ${chapterNum}`,
+        characters: extractCharacters(verses),
+        setting: extractSetting(verses),
+        verseRange: [1, verseCount]
+      });
+    } else {
+      // For longer chapters, divide into 2-3 key scenes
+      const sceneSize = Math.ceil(verseCount / 3);
+      
+      for (let i = 0; i < verseCount; i += sceneSize) {
+        const startVerse = i + 1;
+        const endVerse = Math.min(i + sceneSize, verseCount);
+        const sceneVerses = verses.slice(i, i + sceneSize);
+        
+        scenes.push({
+          event: `${bookName} ${chapterNum}:${startVerse}-${endVerse}`,
+          characters: extractCharacters(sceneVerses),
+          setting: extractSetting(sceneVerses),
+          verseRange: [startVerse, endVerse]
+        });
+      }
     }
-  }, []);
-  
+    
+    return scenes;
+  };
+
+  // Helper function to extract character names from text
+  const extractCharacters = (verses) => {
+    // This is a simple implementation - in a real app, you might use NLP or a predefined list
+    const commonNames = ["Jesus", "God", "Moses", "David", "Paul", "Peter", "John"];
+    const text = verses.map(v => v.text || "").join(" ");
+    
+    const foundNames = commonNames.filter(name => 
+      text.includes(name)
+    );
+    
+    return foundNames.length > 0 ? foundNames.join(", ") : "Biblical figures";
+  };
+
+  // Helper function to extract setting from text
+  const extractSetting = (verses) => {
+    // This is a simple implementation - in a real app, you might use NLP or a predefined list
+    const commonPlaces = ["Jerusalem", "Temple", "Galilee", "Bethlehem", "Mount"];
+    const text = verses.map(v => v.text || "").join(" ");
+    
+    const foundPlaces = commonPlaces.filter(place => 
+      text.includes(place)
+    );
+    
+    return foundPlaces.length > 0 ? foundPlaces.join(", ") : "Biblical setting";
+  };
+
   // Find the current key scene based on verse
   const getCurrentScene = () => {
     if (!content || !content.keyScenes) return null;
@@ -232,13 +391,33 @@ const BibleChapterViewer = ({
     }
   }, []);
 
+  // Add this state
+  const [verseToSpeak, setVerseToSpeak] = useState(null);
+
+  // Add this function to get verse text by number
+  const getVerseTextByNumber = (verseNumber) => {
+    if (!content || !content.verses) return '';
+    const verse = content.verses.find(v => v.number === verseNumber);
+    return verse ? verse.text : '';
+  };
+
   return (
     <div className="bible-chapter-viewer max-w-6xl mx-auto">
       {loading ? (
         <div className="loading flex justify-center p-12">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-bible-gold"></div>
         </div>
-      ) : (
+      ) : isTranslating ? (
+        <div className="translating flex justify-center p-12">
+          <LoadingIndicator 
+            message={`Translating ${book} ${chapter} to ${language}...`} 
+            showProgress={true} 
+            progress={translationProgress.current} 
+            total={translationProgress.total} 
+          />
+        </div>
+      ) : content ? (
+        // Original content display
         <>
           {/* Theme toggle button */}
           {config.features.darkMode && (
@@ -458,11 +637,23 @@ const BibleChapterViewer = ({
                             onClick={(e) => e.stopPropagation()}
                           />
                         )}
-                        <div>
+                        <div className="flex-grow">
                           <span className={`verse-number ${isMobile ? 'font-bold text-bible-gold' : ''}`}>
                             {verse.number}
                           </span>
                           <span className="verse-text ml-1">{verse.text}</span>
+                          
+                          {/* Add a button to speak this verse */}
+                          <button 
+                            className="ml-2 text-bible-royal hover:text-bible-gold"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setVerseToSpeak(verse.number);
+                            }}
+                            title="Listen to this verse"
+                          >
+                            <HiSpeakerphone className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -483,7 +674,34 @@ const BibleChapterViewer = ({
               onClose={closeExplainer}
             />
           )}
+
+          {/* Add the TTS component at the bottom of your component, before the closing tags */}
+          {verseToSpeak && (
+            <div className="fixed bottom-16 right-4 z-50 bg-white p-3 rounded-lg shadow-lg border border-bible-scroll max-w-xs">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-semibold text-bible-royal">
+                  Listen to verse {verseToSpeak}
+                </span>
+                <button 
+                  onClick={() => setVerseToSpeak(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <HiX className="w-4 h-4" />
+                </button>
+              </div>
+              <TextToSpeech 
+                text={getVerseTextByNumber(verseToSpeak)} 
+                language={language}
+              />
+            </div>
+          )}
         </>
+      ) : (
+        <div className="error-state flex justify-center p-12">
+          <div className="bg-red-50 p-4 rounded-lg border border-red-200 text-red-800">
+            No content available for {book} {chapter} in {language}.
+          </div>
+        </div>
       )}
     </div>
   );

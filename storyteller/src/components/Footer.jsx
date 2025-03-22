@@ -1,84 +1,84 @@
 'use client';
 
-import Link from 'next/link';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useState, useEffect } from 'react';
+import Link from 'next/link'; // Added missing import for Link component
 
 const Footer = () => {
-  const { theme } = useTheme();
-  
+  // Check if we're on mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const footerStyles = {
+    container: {
+      padding: '20px 0',
+      marginTop: '40px',
+      borderTop: '1px solid #d1c4a8', // bible-scroll color
+      display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: '20px',
+      fontSize: '14px',
+      color: '#666',
+      width: '100%',
+      maxWidth: '1200px',
+      margin: '0 auto',
+    },
+    column: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: isMobile ? 'center' : 'flex-start',
+      gap: '10px',
+      textAlign: isMobile ? 'center' : 'left',
+    },
+    title: {
+      color: '#2c467a', // bible-royal color
+      marginBottom: '10px',
+      fontWeight: 600,
+      fontSize: '16px',
+    },
+    link: {
+      color: '#666',
+      textDecoration: 'none',
+      transition: 'color 0.2s',
+      cursor: 'pointer',
+    },
+    copyright: {
+      marginTop: '20px',
+      width: '100%',
+      textAlign: 'center',
+      fontSize: '12px',
+      color: '#888',
+    }
+  };
+
   return (
-    <footer className="bg-bible-paper border-t border-bible-scroll">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-          <div className="mb-8 md:mb-0">
-            <h2 className="text-lg font-bold font-biblical text-bible-royal mb-4">StoryTeller</h2>
-            <p className="text-bible-ink text-sm">
-              Biblical visual novels in Nigerian languages with AI-generated imagery to 
-              enhance the experience of reading the Bible in native languages.
-            </p>
-          </div>
-          
-          <div className="mb-8 md:mb-0">
-            <h3 className="text-md font-bold font-biblical text-bible-royal mb-4">About</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/about" className="text-bible-ink hover:text-bible-royal text-sm">
-                  Our Mission
-                </Link>
-              </li>
-              <li>
-                <Link href="/how-it-works" className="text-bible-ink hover:text-bible-royal text-sm">
-                  How It Works
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-bible-ink hover:text-bible-royal text-sm">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-          </div>
-          
-          <div>
-            <h3 className="text-md font-bold font-biblical text-bible-royal mb-4">Languages</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/read?lang=english" className="text-bible-ink hover:text-bible-royal text-sm">
-                  English
-                </Link>
-              </li>
-              <li>
-                <Link href="/read?lang=yoruba" className="text-bible-ink hover:text-bible-royal text-sm">
-                  Yoruba
-                </Link>
-              </li>
-              <li>
-                <Link href="/read?lang=igbo" className="text-bible-ink hover:text-bible-royal text-sm">
-                  Igbo
-                </Link>
-              </li>
-              <li>
-                <Link href="/read?lang=pidgin" className="text-bible-ink hover:text-bible-royal text-sm">
-                  Nigerian Pidgin
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
+    <footer style={footerStyles.container}>
+      <div style={footerStyles.column}>
+        <h3 style={footerStyles.title}>Bible Navigation</h3>
+        <a href="/read?book=Genesis&chapter=1" style={footerStyles.link}>Old Testament</a>
+        <a href="/read?book=Matthew&chapter=1" style={footerStyles.link}>New Testament</a>
+        <p className="text-bible-ink text-sm mb-4 md:mb-0">
+          &copy; {new Date().getFullYear()} StoryTeller. All rights reserved.
+        </p>
         
-        <div className="border-t border-bible-scroll mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-bible-ink text-sm mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} StoryTeller. All rights reserved.
-          </p>
-          
-          <div className="flex space-x-4">
-            <Link href="/terms" className="text-bible-ink hover:text-bible-royal text-xs">
-              Terms of Service
-            </Link>
-            <Link href="/privacy" className="text-bible-ink hover:text-bible-royal text-xs">
-              Privacy Policy
-            </Link>
-          </div>
+        <div className="flex space-x-4">
+          <Link href="/terms" className="text-bible-ink hover:text-bible-royal text-xs">
+            Terms of Service
+          </Link>
+          <Link href="/privacy" className="text-bible-ink hover:text-bible-royal text-xs">
+            Privacy Policy
+          </Link>
         </div>
       </div>
     </footer>

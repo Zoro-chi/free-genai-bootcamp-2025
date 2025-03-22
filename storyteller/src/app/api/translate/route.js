@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { Configuration, OpenAIApi } from 'openai';
-import { InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
-import { getBedrockRuntime, isAwsConfigured } from '@/lib/aws-config';
+import bedrockService from '@/lib/services/bedrockService';
+import { config } from '@/lib/config';
 
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { provider, text, language, prompt = '' } = body;
+    const { provider, text, language, sourceLanguage = 'english', prompt = '' } = body;
     
     if (!text) {
       return NextResponse.json(
@@ -22,10 +22,13 @@ export async function POST(request) {
     let actualProvider = requestedProvider;
     
     // Force mock for Bedrock if not configured
-    if ((actualProvider === 'bedrock' || actualProvider === 'amazonbedrock') && !isAwsConfigured()) {
+    if ((actualProvider === 'bedrock' || actualProvider === 'amazonbedrock') && !bedrockService.checkBedrockConfig()) {
       console.warn('AWS not properly configured, falling back to mock translation');
       actualProvider = 'mock';
     }
+    
+    // Log the translation request
+    console.log(`Translation request: ${actualProvider} for ${language}, text length: ${text.length}`);
     
     switch (actualProvider) {
       case 'openai':
@@ -34,11 +37,18 @@ export async function POST(request) {
       case 'bedrock':
       case 'amazonbedrock':
         try {
-          translation = await translateWithBedrock(text, language, prompt);
+          const translationPrompt = prompt || bedrockService.createTranslationPrompt(text, language, sourceLanguage);
+          const bedrockClient = bedrockService.getBedrockClient();
+          
+          if (bedrockClient) {
+            translation = await bedrockService.translateWithBedrockModels(bedrockClient, translationPrompt, text);
+          } else {
+            throw new Error('Bedrock client not initialized');
+          }
         } catch (error) {
           console.error('Bedrock translation error:', error);
           // Fall back to mock translation
-          translation = generateMockTranslation(text, language);
+          translation = bedrockService.generateMockTranslation(text, language);
         }
         break;
       case 'huggingface':
@@ -46,12 +56,14 @@ export async function POST(request) {
         break;
       default:
         // Development mock
-        translation = generateMockTranslation(text, language);
+        translation = bedrockService.generateMockTranslation(text, language);
     }
     
     return NextResponse.json({ 
       translation, 
-      provider: actualProvider // Return which provider actually delivered the translation
+      provider: actualProvider,
+      sourceLanguage,
+      targetLanguage: language
     });
   } catch (error) {
     console.error('Translation error:', error);
@@ -78,61 +90,22 @@ async function translateWithOpenAI(text, language, prompt) {
   
   const systemPrompt = `You are a professional translator specializing in translating Biblical text to ${language}. 
   Maintain the reverent tone, format, and meaning of the scripture, while making it natural in ${language}.
+  Your translation should be concise and similar in length to the original input text.
+  Never repeat phrases or get stuck in loops. Limit your response to a direct translation.
   Only respond with the translated text, no explanations.`;
   
   const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo", // or "gpt-4" for higher quality
+    model: config?.translation?.openaiModel || "gpt-3.5-turbo", 
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: `${prompt}\n\n${text}` }
     ],
     temperature: 0.3, // Lower temperature for more accurate translation
-    max_tokens: 1024,
+    max_tokens: Math.min(text.length * 4, 500), // Limit token output to prevent repetition loops
+    frequency_penalty: 1.0, // Discourage repetition
   });
   
   return response.data.choices[0].message.content.trim();
-}
-
-/**
- * Translate text using Amazon Bedrock
- */
-async function translateWithBedrock(text, language, prompt) {
-  // Use centralized AWS configuration
-  const bedrockRuntimeClient = getBedrockRuntime();
-  
-  const fullPrompt = `${prompt}\n\n${text}\n\nTranslated text:`;
-  
-  // Updated to use AWS SDK v3 syntax for Titan
-  const input = {
-    modelId: 'amazon.titan-text-express-v1',
-    contentType: 'application/json',
-    accept: 'application/json',
-    body: JSON.stringify({
-      inputText: fullPrompt,
-      textGenerationConfig: {
-        maxTokenCount: 1000,
-        temperature: 0.3,
-        topP: 0.9,
-        stopSequences: []
-      }
-    })
-  };
-  
-  const command = new InvokeModelCommand(input);
-  
-  try {
-    const response = await bedrockRuntimeClient.send(command);
-    
-    // Convert UInt8Array response to text
-    const responseBody = Buffer.from(response.body).toString('utf8');
-    const result = JSON.parse(responseBody);
-    
-    // Extract results from Titan's response format
-    return result.results[0].outputText.trim();
-  } catch (error) {
-    console.error('Error calling Bedrock with SDK v3:', error);
-    throw error; // Re-throw for consistent error handling
-  }
 }
 
 /**
@@ -143,23 +116,4 @@ async function translateWithHuggingFace(text, language) {
   // This would require setting up a Hugging Face API client
   // For now, we'll use a mock implementation
   return `[${language.toUpperCase()} via HF] ${text.substring(0, 100)}`;
-}
-
-/**
- * Generate mock translation for development and fallback
- */
-function generateMockTranslation(text, language) {
-  const languagePrefixes = {
-    yoruba: "YOR:",
-    igbo: "IG:",
-    pidgin: "PID:"
-  };
-  
-  // Make sure all languages have a mock implementation
-  if (!languagePrefixes[language]) {
-    return `[${language.toUpperCase()}] ${text.substring(0, 100)}...`;
-  }
-  
-  const prefix = languagePrefixes[language];
-  return `${prefix} ${text.substring(0, 100)}...`;
 }
