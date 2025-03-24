@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { config } from '@/lib/config';
-import { getAllBooks } from '@/lib/services/mockBibleService';
+import { getAllBooks } from '@/services/mockBibleService';
 
 const BibleNavigation = ({ 
   currentBook = 'Matthew',

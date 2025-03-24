@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getAllBooks } from '@/lib/services/mockBibleService';
+import { getAllBooks } from '@/services/mockBibleService';
 import BibleNavigation from '@/components/BibleNavigation';
 
 export default function Home() {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { Configuration, OpenAIApi } from 'openai';
 import { InvokeModelCommand } from "@aws-sdk/client-bedrock-runtime";
 import { getBedrockRuntime } from '@/lib/aws-config';
-import { translateText } from '@/lib/services/translationService';
+import { translateText } from '@/services/translationService';
 import { formatExplanation } from '@/lib/utils/explanationTemplate';
 
 export async function POST(request) {

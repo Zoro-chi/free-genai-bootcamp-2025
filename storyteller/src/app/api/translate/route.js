@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { Configuration, OpenAIApi } from 'openai';
-import bedrockService from '@/lib/services/bedrockService';
+import OpenAI from 'openai'; // Updated import for v4 SDK
+import bedrockService from '@/services/bedrockService';
 import { config } from '@/lib/config';
 
 export async function POST(request) {
@@ -81,12 +81,10 @@ export async function POST(request) {
  * Translate text using OpenAI API
  */
 async function translateWithOpenAI(text, language, prompt) {
-  // Create the OpenAI configuration
-  const configuration = new Configuration({
+  // Create OpenAI client with v4 SDK pattern
+  const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
-  
-  const openai = new OpenAIApi(configuration);
   
   const systemPrompt = `You are a professional translator specializing in translating Biblical text to ${language}. 
   Maintain the reverent tone, format, and meaning of the scripture, while making it natural in ${language}.
@@ -94,7 +92,7 @@ async function translateWithOpenAI(text, language, prompt) {
   Never repeat phrases or get stuck in loops. Limit your response to a direct translation.
   Only respond with the translated text, no explanations.`;
   
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: config?.translation?.openaiModel || "gpt-3.5-turbo", 
     messages: [
       { role: "system", content: systemPrompt },
@@ -105,7 +103,7 @@ async function translateWithOpenAI(text, language, prompt) {
     frequency_penalty: 1.0, // Discourage repetition
   });
   
-  return response.data.choices[0].message.content.trim();
+  return response.choices[0].message.content.trim();
 }
 
 /**

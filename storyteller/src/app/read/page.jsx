@@ -4,7 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import BibleChapterViewer from '@/components/BibleChapterViewer';
 import { useState, useEffect } from 'react';
-import { getBookInfo } from '@/lib/services/mockBibleService';
+import { getBookInfo } from '@/services/mockBibleService';
 
 export default function ReadPage() {
   const searchParams = useSearchParams();

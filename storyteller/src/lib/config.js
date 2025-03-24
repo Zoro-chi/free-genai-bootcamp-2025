@@ -32,7 +32,18 @@ export const config = {
   // Image generation settings
   imageGeneration: {
     enabled: true,
-    provider: 'bedrock'
+    provider: 'openai',
+    maxImagesPerChapter: 3, // Explicitly set to 5 (not changed, just highlighting)
+    imageSize: '1024x1024',
+    transitionDuration: 500, // ms for image transitions
+    cacheTTL: 30, // days to keep images in cache
+    saveLocally: true, // Add flag to save images locally
+    localImageDir: '/generated-images', // Directory in public folder to save images
+    // More explicit handling of mock images env variable
+    useMockImages: typeof process !== 'undefined' ? 
+      (process.env.NEXT_PUBLIC_USE_MOCK_IMAGES === 'true' || false) : false,
+    mockImageDir: '/images/placeholders', // Directory for placeholder images
+    mockImageCount: 5 // Number of available placeholder images (1.jpg through 5.jpg)
   },
   
   // Translation settings

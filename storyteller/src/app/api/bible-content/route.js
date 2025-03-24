@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchBibleContent } from '@/lib/services/mockBibleService';
+import { fetchBibleContent } from '@/services/mockBibleService';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

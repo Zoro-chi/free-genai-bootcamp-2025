@@ -1,175 +1,185 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { findImageForScene } from '@/lib/imageMapping';
-import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
+import NextImage from 'next/image'; // Rename to avoid conflict with global Image
 import { HiOutlineZoomIn } from 'react-icons/hi';
+import { config } from '@/lib/config';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ImageGenerator = ({ 
-  biblicalEvent, 
-  characters, 
-  setting,
-  language = 'english', 
-  region = 'Yoruba',
-  book,
-  chapter,
-  fixedHeight = false // Add new prop for fixed height
+  currentImageData,
+  isLoading = false,
+  fixedHeight = false,
+  onImageClick = () => {}
 }) => {
-  const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [imageSource, setImageSource] = useState('pregenerated'); // 'pregenerated' or 'generated'
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [currentLoadingState, setCurrentLoadingState] = useState('Loading artwork...');
+  const imageContainerRef = useRef(null);
   
-  // Cache key for localStorage
-  const IMAGE_CACHE_KEY = 'storyteller-image-cache';
-
-  // Initialize cache
-  let imageCache = {};
-
-  // Load cache on mount (client-side only)
+  // For loading animation
+  const loadingMessages = [
+    'Visualizing biblical scene...',
+    'Rendering historical details...',
+    'Capturing the moment...',
+    'Creating sacred imagery...',
+    'Bringing scripture to life...'
+  ];
+  
+  // Cycle through loading messages
   useEffect(() => {
-    // Only load cache on client-side
-    if (typeof window !== 'undefined') {
-      try {
-        const savedCache = localStorage.getItem(IMAGE_CACHE_KEY);
-        if (savedCache) {
-          imageCache = JSON.parse(savedCache);
-          console.log(`Loaded ${Object.keys(imageCache).length} image references from cache`);
-        }
-      } catch (error) {
-        console.error('Failed to load image cache:', error);
-      }
+    if (isLoading || !isImageLoaded) {
+      const interval = setInterval(() => {
+        setCurrentLoadingState(loadingMessages[Math.floor(Math.random() * loadingMessages.length)]);
+      }, 2500);
+      return () => clearInterval(interval);
     }
-  }, []);
-
-  // Save cache function
-  const saveImageCache = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache));
-      } catch (error) {
-        console.error('Failed to save image cache:', error);
-        
-        // If it's a quota error, prune the cache
-        if (error.name === 'QuotaExceededError') {
-          const keys = Object.keys(imageCache);
-          // Keep only the last 20 entries
-          if (keys.length > 20) {
-            const newCache = {};
-            keys.slice(-20).forEach(key => {
-              newCache[key] = imageCache[key];
-            });
-            imageCache = newCache;
-            localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache));
-          }
-        }
-      }
-    }
+  }, [isLoading, isImageLoaded]);
+  
+  // Update image container style to display larger images by default
+  const imageContainerStyle = {
+    ...(fixedHeight ? {
+      height: '450px', // Increased from 330px to show larger images
+    } : {
+      maxHeight: '450px', // Increased from 330px for larger images
+    }),
+    overflow: 'hidden',
+    position: 'relative',
+    width: '100%', // Ensure it takes full width of parent
+    transition: 'height 0.3s ease-in-out',
+    borderRadius: '8px', // Add rounded corners
+    border: '1px solid #e5e7eb', // Add slight border
   };
 
-  // Define fixed height styles
-  const imageContainerStyle = fixedHeight ? {
-    height: '400px',    // Fixed height for the container
-    overflow: 'hidden', // Hide overflow
-    position: 'relative'
-  } : {};
-  
-  const imageStyle = fixedHeight ? {
-    objectFit: 'cover',
+  // Update image wrapper style to better display larger images
+  const imageWrapperStyle = {
     width: '100%',
-    height: '100%'
-  } : {};
+    height: '100%',
+    position: 'relative',
+    overflow: 'hidden',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  };
+
+  // Get image URL - handle both placeholder and real images
+  const placeholderDir = config.imageGeneration.mockImageDir || '/images/placeholders';
+  const placeholderIndex = Math.floor(Math.random() * (config.imageGeneration.mockImageCount || 5)) + 1;
+  const placeholderUrl = `${placeholderDir}/${placeholderIndex}.jpg`;
+  const imageUrl = currentImageData?.imageUrl || placeholderUrl;
   
+  // If image is from generated-images but we're in mock mode, use placeholder instead
+  const useMockImages = config.imageGeneration.useMockImages || 
+                        process.env.NEXT_PUBLIC_USE_MOCK_IMAGES === 'true';
+  
+  const finalImageUrl = useMockImages && imageUrl.includes('/generated-images/') ? 
+    placeholderUrl : imageUrl;
+
+  // Reset loading state when image data changes - with key tracking
   useEffect(() => {
-    const loadImage = async () => {
-      // Only proceed if we have the minimum required context
-      if (!biblicalEvent && !characters) return;
-      
-      setLoading(true);
-      
-      try {
-        // First try to find a pre-generated image
-        if (book && chapter && biblicalEvent) {
-          const pregenImage = findImageForScene(book, chapter, biblicalEvent);
-          
-          if (pregenImage) {
-            // We found a matching pre-generated image
-            setImage(pregenImage);
-            setImageSource('pregenerated');
-            setLoading(false);
-            return;
-          }
-        }
-        
-        // Generate a cache key from props
-        const cacheKey = `${biblicalEvent}-${characters}-${setting}-${language}-${region}`;
-
-        // Check cache before making API call
-        if (imageCache[cacheKey]) {
-          setImage(imageCache[cacheKey]);
-          setLoading(false);
-          return;
-        }
-
-        // If no pre-generated image is found, generate one on-the-fly
-        setImageSource('generated');
-        
-        // Call our API endpoint
-        const response = await axios.post('/api/generate-image', {
-          biblicalEvent,
-          characters,
-          setting,
-          language,
-          region
-        });
-        
-        if (response.data && response.data.imageUrl) {
-          const imageUrl = response.data.imageUrl;
-          // Only cache successful API responses
-          imageCache[cacheKey] = imageUrl;
-          saveImageCache();
-          setImage(imageUrl);
-        }
-      } catch (err) {
-        console.error("Failed to load or generate image:", err);
-        setError("Could not display the requested image");
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Log when image data changes
+    console.log('Image data changed:', currentImageData?.imageUrl);
+    console.log('Verse range:', currentImageData ? `${currentImageData.startVerse}-${currentImageData.endVerse}` : 'None');
     
-    loadImage();
-  }, [biblicalEvent, characters, setting, language, region, book, chapter]);
+    if (currentImageData?.imageUrl) {
+      setIsImageLoaded(false);
+      setShowPlaceholder(true);
+      
+      // Use window.Image to access the native browser Image constructor
+      if (typeof window !== 'undefined') {
+        const preloadImage = new window.Image();
+        // Use finalImageUrl instead of imageUrl to ensure consistent behavior
+        preloadImage.src = finalImageUrl;
+        preloadImage.onload = () => {
+          setIsImageLoaded(true);
+          // Short delay to allow for smooth transition
+          setTimeout(() => setShowPlaceholder(false), 300);
+        };
+        preloadImage.onerror = () => {
+          console.error('Failed to load image:', currentImageData.imageUrl);
+          setIsImageLoaded(true);
+          setShowPlaceholder(false);
+        };
+      } else {
+        // Fallback for server-side rendering
+        setIsImageLoaded(true);
+        setTimeout(() => setShowPlaceholder(false), 300);
+      }
+    }
+  }, [currentImageData?.imageUrl, currentImageData?.startVerse, currentImageData?.endVerse, finalImageUrl]); // Add verse range to dependencies
+  
+  // Add debug logging
+  useEffect(() => {
+    if (!currentImageData) {
+      console.log("Warning: No image data provided to ImageGenerator");
+    }
+  }, [currentImageData]);
+
+  // Handle image click 
+  const handleImageClick = (e) => {
+    // Keep the fullscreen zoom functionality for desktop only
+    if (e.target.tagName === 'IMG' && window.innerWidth >= 768) {
+      setIsZoomed(true);
+      onImageClick();
+    }
+  };
   
   return (
-    <div className="image-generator relative">
-      {loading && (
-        <div className="loading-state">
-          <div className="animate-pulse bg-gray-300 h-64 w-full rounded"></div>
-          <p className="text-center mt-2">Loading scene visualization...</p>
+    <div 
+      className="image-generator relative rounded-lg overflow-hidden"
+      style={imageContainerStyle}
+      ref={imageContainerRef}
+    >
+      {isLoading || !isImageLoaded ? (
+        <div className="loading-state relative flex items-center justify-center h-full w-full">
+          {/* Show low-res placeholder while loading */}
+          {showPlaceholder && (
+            <div className="absolute inset-0 bg-gray-200">
+              <img 
+                src={placeholderUrl} 
+                alt="Loading placeholder" 
+                className="w-full h-full object-cover opacity-40"
+                style={{ filter: 'blur(10px)' }}
+              />
+            </div>
+          )}
+          
+          {/* Loading overlay */}
+          <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center z-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+            <div className="text-white mt-4 font-biblical text-lg text-center px-6">
+              {currentLoadingState}
+            </div>
+            
+            {/* Add subtle progress indicator */}
+            <div className="mt-4 w-40 h-1 bg-gray-700 rounded-full overflow-hidden">
+              <motion.div 
+                className="h-full bg-bible-gold"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ 
+                  duration: 12, 
+                  ease: "linear",
+                  repeat: Infinity
+                }}
+              />
+            </div>
+          </div>
         </div>
-      )}
-      
-      {error && (
-        <div className="error-state">
-          <p className="text-red-500">{error}</p>
-        </div>
-      )}
-      
-      {!loading && !error && image && (
-        <div className="image-container">
-          {/* Overlay for zoomed image */}
+      ) : (
+        <>
+          {/* Overlay for zoomed image - only for desktop */}
           {isZoomed && (
             <div 
               className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
               onClick={() => setIsZoomed(false)}
             >
               <img 
-                src={image} 
-                alt={`${biblicalEvent || ''} ${characters || ''}`}
-                className="max-h-screen max-w-full object-contain" 
+                src={finalImageUrl} 
+                alt={currentImageData?.event || 'Biblical scene'}
+                className="max-h-screen max-w-full object-contain"
+                style={{maxWidth: '95vw', maxHeight: '85vh'}} // Add constraints
               />
               <button 
                 className="absolute top-4 right-4 text-white text-xl font-bold"
@@ -177,43 +187,69 @@ const ImageGenerator = ({
               >
                 ✕
               </button>
+              
+              {currentImageData?.verseRange && (
+                <div className="absolute bottom-4 left-0 right-0 text-center text-white">
+                  <p className="text-sm">
+                    Verses {currentImageData.startVerse}-{currentImageData.endVerse}
+                  </p>
+                </div>
+              )}
             </div>
           )}
           
-          <div className="relative group" style={imageContainerStyle}>
-            {imageSource === 'pregenerated' ? (
-              <Image 
-                src={image} 
-                alt={`${biblicalEvent || ''} ${characters || ''}`}
-                width={500}
-                height={500}
-                className="scene-image object-cover" 
-                style={imageStyle}
-                priority
-              />
-            ) : (
-              <img 
-                src={image} 
-                alt={`${biblicalEvent || ''} ${characters || ''}`}
-                className="scene-image object-cover" 
-                style={imageStyle}
-              />
-            )}
-            
-            {/* Zoom button */}
-            <button
-              onClick={() => setIsZoomed(true)}
-              className="absolute bottom-2 right-2 bg-white bg-opacity-70 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-              aria-label="Zoom image"
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${imageUrl}-${currentImageData?.startVerse}-${currentImageData?.endVerse}`} // Add verse range to key
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              className="relative group cursor-pointer"
+              onClick={handleImageClick}
+              style={imageWrapperStyle}
             >
-              <HiOutlineZoomIn className="w-5 h-5" />
-            </button>
-          </div>
+              <img 
+                src={finalImageUrl} 
+                alt={currentImageData?.event || 'Biblical scene'}
+                className="w-full h-full object-contain" // Changed from object-cover to object-contain
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'contain',
+                  margin: '0 auto',
+                }} 
+                onLoad={() => setIsImageLoaded(true)}
+                onError={(e) => {
+                  console.error('Image failed to load:', finalImageUrl);
+                  
+                  // Prevent infinite loading errors by checking if we're already using a placeholder
+                  if (!finalImageUrl.includes('/images/placeholders/')) {
+                    // Set a valid placeholder image
+                    e.target.src = placeholderUrl;
+                  } else {
+                    // Already using a placeholder, so just mark as loaded and don't change src 
+                    // to avoid triggering another error
+                    console.warn('Even placeholder image failed to load');
+                  }
+                  
+                  // Mark as loaded to stop loading state
+                  setIsImageLoaded(true);
+                }}
+              />
+              
+              {/* Zoom button removed for cleaner mobile experience */}
+            </motion.div>
+          </AnimatePresence>
           
-          <div className="text-xs text-gray-500 mt-1 text-right">
-            {imageSource === 'pregenerated' ? 'Pre-generated image' : 'AI-generated image'}
-          </div>
-        </div>
+          {currentImageData?.verseRange && (
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-2 text-white">
+              <p className="text-xs text-center">
+                Verses {currentImageData.startVerse}-{currentImageData.endVerse}
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
