@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - YARN_TTS_SERVICE_URL=http://yarngpt-service:8000
+    depends_on:
+      - yarngpt-service
+
+  yarngpt-service:
+    build:
+      context: ./yarngpt-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - yarngpt-audio-cache:/app/audio_cache
+
+volumes:
+  yarngpt-audio-cache:

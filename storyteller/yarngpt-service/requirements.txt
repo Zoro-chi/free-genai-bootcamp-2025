@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+torch
+torchaudio
+transformers
+outetts
+uroman
+pydantic
+python-multipart
+gdown
