@@ -41,11 +41,11 @@ app.add_middleware(
 
 # Define model paths
 tokenizer_path = "saheedniyi/YarnGPT2"
-wav_tokenizer_config = "wavtokenizer_mediumdata_frame75_3s_nq1_code4096_dim512_kmeans200_attn.yaml"
-wav_tokenizer_model = "wavtokenizer_large_speech_320_24k.ckpt"
+wav_tokenizer_config_path = "wavtokenizer_mediumdata_frame75_3s_nq1_code4096_dim512_kmeans200_attn.yaml"
+wav_tokenizer_model_path = "wavtokenizer_large_speech_320_24k.ckpt"
 
 # Download models if they don't exist
-if not os.path.exists(wav_tokenizer_config) or not os.path.exists(wav_tokenizer_model):
+if not os.path.exists(wav_tokenizer_config_path) or not os.path.exists(wav_tokenizer_model_path):
     print("Downloading model files...")
     # Download YAML config using curl
     os.system("curl -L 'https://huggingface.co/novateur/WavTokenizer-medium-speech-75token/resolve/main/wavtokenizer_mediumdata_frame75_3s_nq1_code4096_dim512_kmeans200_attn.yaml' -o wavtokenizer_mediumdata_frame75_3s_nq1_code4096_dim512_kmeans200_attn.yaml")
@@ -55,14 +55,14 @@ if not os.path.exists(wav_tokenizer_config) or not os.path.exists(wav_tokenizer_
     os.system("gdown 1-ASeEkrn4HY49yZWHTASgfGFNXdVnLTt")
     
     # Verify the file is now a valid PyTorch model
-    if os.path.exists(wav_tokenizer_model):
-        filesize = os.path.getsize(wav_tokenizer_model)
+    if os.path.exists(wav_tokenizer_model_path):
+        filesize = os.path.getsize(wav_tokenizer_model_path)
         print(f"Downloaded model file size: {filesize} bytes")
         
         if filesize < 1000000:  # Less than 1MB is suspicious for a model file
             print("WARNING: Model file seems too small, might not be valid")
             # Let's check what's in the file
-            os.system(f"head -c 100 {wav_tokenizer_model} | hexdump -C")
+            os.system(f"head -c 100 {wav_tokenizer_model_path} | hexdump -C")
     else:
         print("ERROR: Failed to download model file")
 
@@ -87,18 +87,19 @@ def load_models():
         print("Loading YarnGPT2 models...")
         try:
             # Check if the model file exists and has reasonable size
-            if not os.path.exists(wav_tokenizer_model):
-                raise FileNotFoundError(f"Model file {wav_tokenizer_model} not found")
+            if not os.path.exists(wav_tokenizer_model_path):
+                raise FileNotFoundError(f"Model file {wav_tokenizer_model_path} not found")
                 
-            filesize = os.path.getsize(wav_tokenizer_model)
+            filesize = os.path.getsize(wav_tokenizer_model_path)
             if filesize < 1000000:  # Less than 1MB is suspicious for a model file
                 print(f"WARNING: Model file size ({filesize} bytes) seems too small")
                 
-            print(f"Initializing AudioTokenizerV2 with model: {wav_tokenizer_model} ({filesize} bytes)")
+            print(f"Initializing AudioTokenizerV2 with model: {wav_tokenizer_model_path} ({filesize} bytes)")
+            # Match the exact order in documentation: tokenizer_path, model_path, config_path
             audio_tokenizer = AudioTokenizerV2(
                 tokenizer_path, 
-                wav_tokenizer_model, 
-                wav_tokenizer_config
+                wav_tokenizer_model_path, 
+                wav_tokenizer_config_path
             )
             
             model = AutoModelForCausalLM.from_pretrained(
@@ -109,9 +110,9 @@ def load_models():
         except Exception as e:
             print(f"ERROR loading models: {str(e)}")
             # Add debug info about the model file
-            if os.path.exists(wav_tokenizer_model):
-                os.system(f"file {wav_tokenizer_model}")
-                os.system(f"head -c 50 {wav_tokenizer_model} | hexdump -C")
+            if os.path.exists(wav_tokenizer_model_path):
+                os.system(f"file {wav_tokenizer_model_path}")
+                os.system(f"head -c 50 {wav_tokenizer_model_path} | hexdump -C")
             raise e
 
 @app.get("/")
@@ -141,79 +142,87 @@ async def generate_tts(request: TTSRequest):
         if os.path.exists(output_path):
             return {"audioUrl": f"/audio/{filename}", "cached": True}
         
-        # Preprocess text: replace semicolons with commas to help with parsing
-        processed_text = request.text.replace(';', ',')
+        # Store the original text
+        original_text = request.text
         
-        # If text is long, check if we need to split it
-        max_text_length = 200  # Characters - adjust based on testing
-        if len(processed_text) > max_text_length:
-            print(f"Warning: Text is long ({len(processed_text)} chars), might be truncated")
+        # IMPORTANT: Don't modify the input text anymore - just pass it directly
+        processed_text = request.text
         
-        # Create prompt for YarnGPT2
+        # Debug print the exact text being used
+        print(f"Original text: '{original_text}'")
+        print(f"Text used for TTS: '{processed_text}'")
+        
+        # Check if text exceeds token limit - but don't truncate automatically
+        if len(processed_text) > 500:  # increased from 200
+            print(f"Warning: Text is very long ({len(processed_text)} chars), might cause generation issues")
+        
+        # Create prompt for YarnGPT2 - follow documentation exactly
         prompt = audio_tokenizer.create_prompt(
             text=processed_text,
             lang=request.language,
             speaker_name=request.speaker_name
         )
         
-        # Tokenize prompt
+        # Tokenize prompt - keep it simple like in the docs
         input_ids = audio_tokenizer.tokenize_prompt(prompt)
         
-        # Create attention mask (all 1s since we don't have padding)
-        attention_mask = torch.ones(input_ids.shape, dtype=torch.long, device=input_ids.device)
-        
-        # Get tokenizer info for proper configuration
-        if hasattr(audio_tokenizer, 'tokenizer'):
-            tokenizer = audio_tokenizer.tokenizer
-            pad_token_id = tokenizer.pad_token_id if tokenizer.pad_token_id is not None else 0
-            eos_token_id = tokenizer.eos_token_id if tokenizer.eos_token_id is not None else 0
-            # Ensure pad_token_id is different from eos_token_id
-            if pad_token_id == eos_token_id:
-                pad_token_id = tokenizer.eos_token_id + 1
-        else:
-            # Default values if tokenizer isn't directly accessible
-            pad_token_id = 1  # Different from default eos_token_id (0)
-            eos_token_id = 0
-        
-        # Generate output with explicit parameters to avoid warnings
-        # Enable sampling to use temperature properly
+        # Generate output following the documentation exactly
         output = model.generate(
             input_ids=input_ids,
-            attention_mask=attention_mask,
-            pad_token_id=pad_token_id,
-            eos_token_id=eos_token_id,
-            do_sample=True,  # Enable sampling to use temperature
             temperature=0.1,
             repetition_penalty=1.1,
             max_length=4000,
-            # Add parameters to improve reliability
-            top_k=50,
-            top_p=0.95,
-            no_repeat_ngram_size=2
         )
         
-        # Log token lengths to help diagnose truncation
+        # Log token lengths
         print(f"Input tokens: {input_ids.shape[1]}, Output tokens: {output.shape[1]}")
         
-        # Convert to audio
+        # Follow documentation example exactly for audio generation
+        print("Generating audio codes...")
         codes = audio_tokenizer.get_codes(output)
+        
+        print("Generating audio from codes...")
         audio = audio_tokenizer.get_audio(codes)
         
-        # Save audio file
-        torchaudio.save(output_path, audio, sample_rate=24000)
+        # Simple validation without modifying the tensor
+        print(f"Audio shape: {audio.shape}, duration: {audio.shape[1]/24000:.2f}s")
         
-        # Return success response with info about text length
+        # Add 1 second of silence padding at beginning and end
+        sample_rate = 24000
+        silence_samples = sample_rate  # 1 second of silence
+        
+        # Create silence tensors (1-channel audio with zeros)
+        silence = torch.zeros(1, silence_samples, device=audio.device, dtype=audio.dtype)
+        
+        # Add padding to beginning and end
+        padded_audio = torch.cat([silence, audio, silence], dim=1)
+        
+        print(f"Padded audio shape: {padded_audio.shape}, duration: {padded_audio.shape[1]/sample_rate:.2f}s")
+        
+        # Save audio file with padding
+        print(f"Saving padded audio to {output_path}")
+        torchaudio.save(output_path, padded_audio, sample_rate=sample_rate)
+        
+        # Calculate durations for the response
+        original_duration = audio.shape[1] / sample_rate
+        padded_duration = padded_audio.shape[1] / sample_rate
+        
+        # Return success response
         return {
             "audioUrl": f"/audio/{filename}", 
             "cached": False,
             "textLength": len(request.text),
-            "processedTextLength": len(processed_text),
-            "inputTokens": input_ids.shape[1],
-            "outputTokens": output.shape[1]
+            "audioDuration": f"{padded_duration:.2f}s",
+            "originalDuration": f"{original_duration:.2f}s",
+            "paddingAdded": "1 second before and after"
         }
     
     except Exception as e:
         print(f"Error in TTS generation: {str(e)}")
+        print(f"Exception type: {type(e).__name__}")
+        print(f"Request text: '{request.text}'")
+        print(f"Request language: {request.language}")
+        print(f"Request speaker: {request.speaker_name}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/audio/{filename}")

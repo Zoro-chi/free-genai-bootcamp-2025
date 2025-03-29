@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - YARN_TTS_SERVICE_URL=http://yarngpt-service:8000
+      - NEXT_PUBLIC_YARN_TTS_SERVICE_URL=http://yarngpt-service:8000
     depends_on:
       - yarngpt-service
 

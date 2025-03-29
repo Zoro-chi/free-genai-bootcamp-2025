@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { config } from "@/lib/config";
 import { getAllBooks } from "../lib/services/mockBibleService";
-import { HiSpeakerphone } from "react-icons/hi";
+import { HiSpeakerphone, HiPause, HiPlay, HiStop } from "react-icons/hi";
+import { generateSpeech, mapLanguageToTTS } from "../services/ttsService";
 
 const BibleNavigation = ({
   currentBook = "Matthew",
@@ -21,6 +22,10 @@ const BibleNavigation = ({
   const [loadingBooks, setLoadingBooks] = useState(true);
   const [testament, setTestament] = useState("new"); // For tracking current testament
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const audioRef = useRef(null);
 
   // Define Old Testament books in chronological order
   const oldTestamentOrder = [
@@ -336,79 +341,157 @@ const BibleNavigation = ({
   };
 
   // Function to handle TTS for the entire chapter
-  const handleChapterTTS = () => {
-    if (!verses || verses.length === 0) {
-      console.log("No verses available for TTS");
+  const handleChapterTTS = async () => {
+    if (!verses || verses.length === 0) return;
+
+    // If already speaking, stop it
+    if (isSpeaking) {
+      stopSpeech();
       return;
     }
 
-    // Toggle speaking state
-    setIsSpeaking(!isSpeaking);
+    // Process the verse text to remove verse numbers
+    const cleanedVerses = verses.map((verse) => {
+      let text = verse.text;
+      text = text.replace(/^(Verse\s+)?(\d+)[\s:.]+/i, "");
+      text = text.replace(/^\s*\d+\s*/, "");
+      return text.trim();
+    });
 
-    if (!isSpeaking) {
-      // Start speaking logic would go here
-      console.log("Starting TTS with verses:", verses.length);
+    // Create introduction with book and chapter
+    const introduction = `${currentBook}, chapter ${currentChapter}.`;
 
-      // Use browser's built-in speech synthesis if available
-      if ("speechSynthesis" in window) {
-        // Cancel any previous speech
-        window.speechSynthesis.cancel();
+    // Join all verses with spaces and add the introduction
+    const text = introduction + " " + cleanedVerses.join(" ");
 
-        // Create text to speak - prepare chapter introduction
-        const chapterIntro = `${currentBook}, chapter ${currentChapter}.`;
-        const verseTexts = verses.map(
-          (verse) => `Verse ${verse.number}. ${verse.text}`
-        );
-        const text = [chapterIntro, ...verseTexts].join(" ");
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const utterance = new SpeechSynthesisUtterance(text);
+      // Map language code to TTS language and speaker
+      const { language: ttsLanguage, speaker } = mapLanguageToTTS(language);
 
-        // Set language based on current selection
-        switch (language) {
-          case "yoruba":
-            utterance.lang = "yo";
-            break;
-          case "igbo":
-            utterance.lang = "ig";
-            break;
-          case "pidgin":
-            // Use English for pidgin as there's no standard code
-            utterance.lang = "en-NG";
-            break;
-          default:
-            utterance.lang = "en-US";
-        }
+      console.log(
+        `Using YarnGPT TTS with language: ${ttsLanguage}, speaker: ${speaker}`
+      );
 
-        // Add event handlers to update UI state
-        utterance.onstart = () => {
-          console.log("Speech started");
-          setIsSpeaking(true);
-        };
+      // Call YarnGPT TTS service
+      const result = await generateSpeech(text, ttsLanguage, speaker);
 
-        utterance.onend = () => {
-          console.log("Speech ended");
+      console.log("TTS response:", result);
+
+      // Create or update audio element
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+
+        // Set up event handlers
+        audioRef.current.onended = () => {
           setIsSpeaking(false);
+          setIsPaused(false);
         };
 
-        utterance.onerror = (event) => {
-          console.error("Speech error:", event);
+        audioRef.current.onerror = () => {
+          console.error("Audio playback error:", audioRef.current.error);
           setIsSpeaking(false);
-          alert("Speech synthesis failed. Please try again.");
+          setIsPaused(false);
+          setError("Failed to play audio");
         };
-
-        // Start speaking
-        window.speechSynthesis.speak(utterance);
-      } else {
-        alert("Text-to-speech is not supported in this browser.");
-        setIsSpeaking(false);
       }
+
+      // Set the audio source and play
+      audioRef.current.src = result.audioUrl;
+      audioRef.current.play();
+
+      setIsSpeaking(true);
+      setIsPaused(false);
+    } catch (err) {
+      console.error("TTS error:", err);
+      setError(`TTS failed: ${err.message}`);
+
+      // Fall back to browser TTS if YarnGPT fails
+      useBrowserTTS(text);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fallback to browser TTS
+  const useBrowserTTS = (text) => {
+    if ("speechSynthesis" in window) {
+      // Use browser's built-in speech synthesis as fallback
+      console.log("Falling back to browser TTS");
+      speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+
+      // Set language based on current selection
+      switch (language) {
+        case "yoruba":
+          utterance.lang = "yo";
+          break;
+        case "igbo":
+          utterance.lang = "ig";
+          break;
+        case "pidgin":
+          utterance.lang = "en-NG";
+          break;
+        default:
+          utterance.lang = "en-US";
+      }
+
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+      };
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setIsPaused(false);
+      };
+
+      speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+      setIsPaused(false);
     } else {
-      // Stop speaking
-      if ("speechSynthesis" in window) {
-        window.speechSynthesis.cancel();
+      alert("Text-to-speech is not supported in this browser.");
+    }
+  };
+
+  // Function to toggle pause/resume speech
+  const togglePause = () => {
+    if (!isSpeaking) return;
+
+    if (audioRef.current) {
+      if (isPaused) {
+        audioRef.current.play();
+        setIsPaused(false);
+      } else {
+        audioRef.current.pause();
+        setIsPaused(true);
       }
     }
   };
+
+  // Function to stop speech completely
+  const stopSpeech = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+
+    setIsSpeaking(false);
+    setIsPaused(false);
+  };
+
+  // Clean up audio element on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div style={styles.container}>
@@ -491,35 +574,114 @@ const BibleNavigation = ({
             </select>
           </div>
 
-          {/* Add TTS button after language dropdown */}
+          {/* TTS controls */}
           <div
             style={{
               flex: isMobile ? "1 0 auto" : "0 0 auto",
               marginLeft: isMobile ? "0" : "8px",
+              display: "flex",
+              flexDirection: "column", // Changed to column to add error message below
+              gap: "8px",
+              width: isMobile ? "100%" : "auto",
             }}
           >
-            <button
-              onClick={handleChapterTTS}
-              title={isSpeaking ? "Stop reading" : "Listen to this chapter"}
+            <div
               style={{
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "8px 12px",
-                borderRadius: "6px",
-                backgroundColor: isSpeaking ? "#c53030" : "#2c467a", // bible-royal color
-                color: "white",
-                border: "none",
-                cursor: "pointer",
-                fontSize: isMobile ? "14px" : "16px",
+                gap: "8px",
                 width: "100%",
-                transition: "background-color 0.3s ease",
               }}
-              aria-label={isSpeaking ? "Stop reading" : "Listen to chapter"}
             >
-              <HiSpeakerphone style={{ marginRight: "6px" }} />
-              {isSpeaking ? "Stop" : "Listen"}
-            </button>
+              {/* Main Listen/Stop button */}
+              <button
+                onClick={handleChapterTTS}
+                disabled={isLoading}
+                title={isSpeaking ? "Stop reading" : "Listen to this chapter"}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  backgroundColor: isLoading
+                    ? "#6B7280" // Gray when loading
+                    : isSpeaking
+                      ? "#c53030" // Red when speaking
+                      : "#2c467a", // Default blue
+                  color: "white",
+                  border: "none",
+                  cursor: isLoading ? "wait" : "pointer",
+                  fontSize: isMobile ? "14px" : "16px",
+                  width: isSpeaking ? "50%" : "100%",
+                  transition: "background-color 0.3s ease",
+                  opacity: isLoading ? 0.7 : 1,
+                }}
+                aria-label={isSpeaking ? "Stop reading" : "Listen to chapter"}
+              >
+                {isLoading ? (
+                  "Loading..."
+                ) : isSpeaking ? (
+                  <>
+                    <HiStop style={{ marginRight: "6px" }} />
+                    Stop
+                  </>
+                ) : (
+                  <>
+                    <HiSpeakerphone style={{ marginRight: "6px" }} />
+                    Listen
+                  </>
+                )}
+              </button>
+
+              {/* Pause/Resume button - only shown when speech is active */}
+              {isSpeaking && (
+                <button
+                  onClick={togglePause}
+                  title={isPaused ? "Resume reading" : "Pause reading"}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "8px 12px",
+                    borderRadius: "6px",
+                    backgroundColor: isPaused ? "#e3a008" : "#4a5568", // gold for resume, gray for pause
+                    color: "white",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: isMobile ? "14px" : "16px",
+                    width: "50%",
+                    transition: "background-color 0.3s ease",
+                  }}
+                  aria-label={isPaused ? "Resume reading" : "Pause reading"}
+                >
+                  {isPaused ? (
+                    <>
+                      <HiPlay style={{ marginRight: "6px" }} />
+                      Play
+                    </>
+                  ) : (
+                    <>
+                      <HiPause style={{ marginRight: "6px" }} />
+                      Pause
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Error message */}
+            {error && (
+              <div
+                style={{
+                  color: "#c53030",
+                  fontSize: "12px",
+                  marginTop: "4px",
+                  textAlign: "center",
+                }}
+              >
+                {error}
+              </div>
+            )}
           </div>
         </>
       )}
